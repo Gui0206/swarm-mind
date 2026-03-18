@@ -2,7 +2,12 @@
   <div class="game-root">
     <!-- ========== LOBBY ========== -->
     <div v-if="phase === 'lobby'" class="lobby">
-      <router-link to="/" class="top-back">&larr; MIROFISH</router-link>
+      <div class="lobby-top">
+        <router-link to="/" class="top-back">&larr; MIROFISH</router-link>
+        <button class="theme-toggle" @click="toggle" :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+          {{ theme === 'dark' ? '\u2600' : '\u263E' }}
+        </button>
+      </div>
 
       <div class="lobby-header">
         <h1 class="lobby-title">SWARM MIND</h1>
@@ -16,26 +21,55 @@
 
       <div v-if="error" class="error-banner">{{ error }}</div>
 
-      <div class="scenario-grid">
-        <button
-          v-for="s in scenarios"
-          :key="s.id"
-          class="scenario-card"
-          @click="startGame(s.id)"
-          :disabled="starting"
-        >
-          <div class="sc-title">{{ s.title }}</div>
-          <div class="sc-desc">{{ s.description }}</div>
-          <div class="sc-meta">
-            <span class="sc-obj">{{ s.objective }}</span>
-            <span class="sc-agents">{{ s.agent_count }} agents</span>
-          </div>
+      <!-- Custom scenario from shared link -->
+      <template v-if="customScenario">
+        <div class="custom-banner">CUSTOM SCENARIO</div>
+        <div class="scenario-grid">
+          <button
+            class="scenario-card scenario-card-custom"
+            @click="startCustomGame()"
+            :disabled="starting"
+          >
+            <div class="sc-title">{{ customScenario.title }}</div>
+            <div class="sc-desc">{{ customScenario.description }}</div>
+            <div class="sc-meta">
+              <span class="sc-obj">{{ customScenario.objective }}</span>
+              <span class="sc-agents">{{ customScenario.agents.length }} agents</span>
+            </div>
+            <div class="sc-agent-emojis">
+              <span v-for="(a, i) in customScenario.agents" :key="i">{{ a.emoji }}</span>
+            </div>
+          </button>
+        </div>
+        <button class="random-btn" @click="startCustomGame()" :disabled="starting">
+          {{ starting ? 'INITIALIZING SWARM...' : 'PLAY THIS CHALLENGE' }}
         </button>
-      </div>
+        <router-link to="/game" class="browse-link" @click.native="clearCustom">or browse all scenarios</router-link>
+      </template>
 
-      <button class="random-btn" @click="startGame(null)" :disabled="starting">
-        {{ starting ? 'INITIALIZING SWARM...' : 'RANDOM SCENARIO' }}
-      </button>
+      <!-- Normal scenario grid -->
+      <template v-else>
+        <div class="scenario-grid">
+          <button
+            v-for="s in scenarios"
+            :key="s.id"
+            class="scenario-card"
+            @click="startGame(s.id)"
+            :disabled="starting"
+          >
+            <div class="sc-title">{{ s.title }}</div>
+            <div class="sc-desc">{{ s.description }}</div>
+            <div class="sc-meta">
+              <span class="sc-obj">{{ s.objective }}</span>
+              <span class="sc-agents">{{ s.agent_count }} agents</span>
+            </div>
+          </button>
+        </div>
+
+        <button class="random-btn" @click="startGame(null)" :disabled="starting">
+          {{ starting ? 'INITIALIZING SWARM...' : 'RANDOM SCENARIO' }}
+        </button>
+      </template>
     </div>
 
     <!-- ========== GAME ========== -->
@@ -44,9 +78,14 @@
       <div class="game-hud">
         <button class="hud-btn" @click="confirmExit">EXIT</button>
         <span class="hud-scenario">{{ game?.scenario?.title }}</span>
-        <span class="hud-round">
-          ROUND {{ game?.current_round || 0 }} / {{ game?.total_rounds || 0 }}
-        </span>
+        <div class="hud-right">
+          <span class="hud-round">
+            ROUND {{ game?.current_round || 0 }} / {{ game?.total_rounds || 0 }}
+          </span>
+          <button class="theme-toggle theme-toggle-sm" @click="toggle">
+            {{ theme === 'dark' ? '\u2600' : '\u263E' }}
+          </button>
+        </div>
       </div>
 
       <div class="game-body">
@@ -193,10 +232,14 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import * as gameApi from '../api/game.js'
+import { useTheme } from '../composables/useTheme.js'
+
+const { theme, toggle } = useTheme()
 
 // --- State ---
 const phase = ref('lobby') // lobby | playing | result
 const scenarios = ref([])
+const customScenario = ref(null) // decoded custom scenario from URL
 const game = ref(null)
 const visibleMessages = ref([])
 const selectedAgentId = ref('')
@@ -224,8 +267,48 @@ const selectedAgentName = computed(() => {
   return a ? a.name : ''
 })
 
+// --- URL decoding for custom scenarios ---
+function decodeCustomHash() {
+  const hash = window.location.hash
+  if (!hash.startsWith('#custom=')) return null
+  try {
+    const encoded = hash.slice('#custom='.length)
+    const padded = encoded.replace(/-/g, '+').replace(/_/g, '/')
+    const pad = (4 - padded.length % 4) % 4
+    const b64 = padded + '='.repeat(pad)
+    const binary = atob(b64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+    const compact = JSON.parse(new TextDecoder().decode(bytes))
+    return {
+      title: compact.t,
+      description: compact.d || compact.t,
+      objective: compact.o,
+      opening: compact.p,
+      eval_q: compact.q || compact.o,
+      rounds: compact.r || 6,
+      agents: (compact.a || []).map(a => ({
+        name: a.n,
+        emoji: a.e || '\u{1F916}',
+        personality: a.y || a.b || '',
+        bio: a.b || a.y || '',
+      })),
+    }
+  } catch {
+    return null
+  }
+}
+
 // --- Lifecycle ---
 onMounted(async () => {
+  // Check for custom scenario in URL hash
+  const custom = decodeCustomHash()
+  if (custom) {
+    customScenario.value = custom
+    // Don't load built-in scenarios — show only the custom one
+    return
+  }
+
   try {
     scenarios.value = await gameApi.getScenarios()
   } catch (e) {
@@ -253,6 +336,30 @@ async function startGame(scenarioId) {
   } catch (e) {
     starting.value = false
     error.value = e?.response?.data?.error || e?.error || e?.message || 'Failed to start game'
+    phase.value = 'lobby'
+    thinking.value = false
+  }
+}
+
+async function startCustomGame() {
+  if (!customScenario.value) return
+  try {
+    error.value = null
+    starting.value = true
+    phase.value = 'playing'
+    thinking.value = true
+    visibleMessages.value = []
+    selectedAgentId.value = ''
+    whisperText.value = ''
+    evaluation.value = null
+
+    game.value = await gameApi.newCustomGame(customScenario.value)
+
+    await runTick()
+    starting.value = false
+  } catch (e) {
+    starting.value = false
+    error.value = e?.response?.data?.error || e?.error || e?.message || 'Failed to start custom game'
     phase.value = 'lobby'
     thinking.value = false
   }
@@ -332,6 +439,13 @@ function backToLobby() {
   error.value = null
 }
 
+function clearCustom() {
+  customScenario.value = null
+  window.location.hash = ''
+  // Load built-in scenarios
+  gameApi.getScenarios().then(s => { scenarios.value = s }).catch(() => {})
+}
+
 function scrollToBottom() {
   if (convScroll.value) {
     convScroll.value.scrollTop = convScroll.value.scrollHeight
@@ -344,25 +458,6 @@ function delay(ms) {
 </script>
 
 <style scoped>
-/* ============================================
-   SWARM MIND — Dark Neon Theme
-   ============================================ */
-:root {
-  --bg: #06060f;
-  --surface: #0c0c1a;
-  --surface2: #12122a;
-  --border: rgba(255,255,255,0.06);
-  --cyan: #00e5ff;
-  --gold: #ffd740;
-  --purple: #c06cff;
-  --green: #69f0ae;
-  --red: #ff5252;
-  --text: #e0e0e0;
-  --text2: rgba(255,255,255,0.45);
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Space Grotesk', 'JetBrains Mono', monospace;
-}
-
 .game-root {
   min-height: 100vh;
   background: var(--bg);
@@ -377,6 +472,13 @@ function delay(ms) {
   padding: 60px 24px;
 }
 
+.lobby-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
 .top-back {
   display: inline-block;
   color: var(--text2);
@@ -384,13 +486,12 @@ function delay(ms) {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
-  margin-bottom: 40px;
   border: 1px solid var(--border);
   padding: 6px 14px;
   border-radius: 4px;
   transition: all 0.2s;
 }
-.top-back:hover { color: var(--cyan); border-color: rgba(0,229,255,0.3); }
+.top-back:hover { color: var(--cyan); border-color: var(--cyan); }
 
 .lobby-header { text-align: center; margin-bottom: 50px; }
 
@@ -399,7 +500,6 @@ function delay(ms) {
   font-size: 52px;
   font-weight: 700;
   color: var(--cyan);
-  text-shadow: 0 0 60px rgba(0,229,255,0.3);
   margin: 0 0 10px;
 }
 
@@ -459,7 +559,7 @@ function delay(ms) {
   font-family: var(--sans);
   font-size: 17px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   margin-bottom: 8px;
 }
 .sc-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
@@ -487,6 +587,41 @@ function delay(ms) {
 .random-btn:hover { background: rgba(0,229,255,0.1); }
 .random-btn:disabled { opacity: 0.5; cursor: wait; }
 
+.custom-banner {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--purple);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.scenario-card-custom {
+  border-color: var(--purple);
+}
+.scenario-card-custom:hover {
+  border-color: var(--purple);
+  box-shadow: 0 8px 30px rgba(192,108,255,0.12);
+}
+
+.sc-agent-emojis {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.browse-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: var(--text2);
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.browse-link:hover { color: var(--cyan); }
+
 /* ---- GAME LAYOUT ---- */
 .game-container {
   height: 100vh;
@@ -501,7 +636,7 @@ function delay(ms) {
   justify-content: space-between;
   padding: 0 20px;
   height: 48px;
-  background: #0a0a16;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -525,7 +660,13 @@ function delay(ms) {
   font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--heading);
+}
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .hud-round {
@@ -533,6 +674,12 @@ function delay(ms) {
   color: var(--cyan);
   font-weight: 700;
   letter-spacing: 1px;
+}
+
+.theme-toggle-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
 }
 
 .game-body {
@@ -590,8 +737,8 @@ function delay(ms) {
 }
 
 .msg-whispered {
-  background: rgba(192, 108, 255, 0.06);
-  border-color: rgba(192, 108, 255, 0.15);
+  background: rgba(192, 108, 255, 0.08);
+  border-color: rgba(192, 108, 255, 0.2);
 }
 
 @keyframes msgIn {
@@ -718,13 +865,13 @@ function delay(ms) {
 }
 .whisper-input:focus { border-color: var(--purple); }
 .whisper-input:disabled { opacity: 0.4; }
-.whisper-input::placeholder { color: rgba(255,255,255,0.2); }
+.whisper-input::placeholder { color: var(--text2); opacity: 0.5; }
 
 .whisper-actions { display: flex; justify-content: flex-end; }
 
 .btn-advance {
   background: var(--cyan);
-  color: #000;
+  color: var(--bg);
   border: none;
   font-family: var(--mono);
   font-size: 12px;
@@ -761,8 +908,8 @@ function delay(ms) {
 }
 
 .obj-card {
-  background: rgba(255,215,64,0.05);
-  border: 1px solid rgba(255,215,64,0.15);
+  background: rgba(255,215,64,0.06);
+  border: 1px solid rgba(255,215,64,0.2);
   border-radius: 8px;
   padding: 16px;
 }
@@ -798,15 +945,15 @@ function delay(ms) {
   transition: all 0.2s;
   margin-bottom: 4px;
 }
-.agent-card:hover { background: rgba(255,255,255,0.03); }
+.agent-card:hover { background: rgba(128,128,128,0.08); }
 .agent-card.selected {
   border-color: var(--purple);
-  background: rgba(192,108,255,0.06);
+  background: rgba(192,108,255,0.08);
 }
 
 .agent-emoji { font-size: 20px; flex-shrink: 0; }
 .agent-info { flex: 1; min-width: 0; }
-.agent-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.agent-name { font-size: 12px; font-weight: 700; color: var(--heading); margin-bottom: 2px; }
 .agent-bio { font-size: 10px; color: var(--text2); line-height: 1.3; }
 
 .stats-section {}
@@ -831,7 +978,7 @@ function delay(ms) {
   font-size: 10px;
   color: var(--text2);
   padding: 6px 8px;
-  background: rgba(192,108,255,0.04);
+  background: rgba(192,108,255,0.06);
   border-radius: 4px;
   margin-bottom: 4px;
   line-height: 1.4;
@@ -887,7 +1034,7 @@ function delay(ms) {
 .result-score {
   font-size: 40px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   margin-bottom: 16px;
 }
 
@@ -908,7 +1055,7 @@ function delay(ms) {
 
 .rbtn {
   background: var(--cyan);
-  color: #000;
+  color: var(--bg);
   border: none;
   font-family: var(--mono);
   font-size: 13px;
@@ -960,5 +1107,5 @@ function delay(ms) {
 .conv-scroll::-webkit-scrollbar-track,
 .sidebar::-webkit-scrollbar-track { background: transparent; }
 .conv-scroll::-webkit-scrollbar-thumb,
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 </style>

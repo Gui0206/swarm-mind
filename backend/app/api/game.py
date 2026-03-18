@@ -32,6 +32,21 @@ def new_game():
         return jsonify({'error': f'Failed to create game: {str(e)}'}), 500
 
 
+@game_bp.route('/new-custom', methods=['POST'])
+def new_custom_game():
+    """Start a game with a user-provided custom scenario."""
+    try:
+        data = request.get_json(silent=True) or {}
+        engine = get_engine()
+        session = engine.new_custom_game(data)
+        return jsonify(session.to_dict())
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Failed to create custom game: {e}")
+        return jsonify({'error': f'Failed to create custom game: {str(e)}'}), 500
+
+
 @game_bp.route('/<game_id>', methods=['GET'])
 def get_game(game_id):
     """Get current game state."""

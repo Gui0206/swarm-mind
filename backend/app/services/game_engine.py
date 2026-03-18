@@ -209,6 +209,47 @@ class GameEngine:
         logger.info(f"New game: {session.id} scenario={scenario['id']}")
         return session
 
+    def new_custom_game(self, scenario_data):
+        """Start a game with a user-provided custom scenario."""
+        # Validate required fields
+        for field in ('title', 'objective', 'opening', 'agents'):
+            if not scenario_data.get(field):
+                raise ValueError(f"Missing required field: {field}")
+
+        agents = scenario_data['agents']
+        if not isinstance(agents, list) or len(agents) < 2 or len(agents) > 10:
+            raise ValueError("Agents must be a list of 2-10 entries")
+
+        # Normalise agents — generate IDs from names if missing
+        for i, a in enumerate(agents):
+            if not a.get('name'):
+                raise ValueError(f"Agent {i+1} is missing a name")
+            a.setdefault('id', a['name'].lower().replace(' ', '_')[:20])
+            a.setdefault('emoji', '\U0001F916')
+            a.setdefault('personality', a.get('bio', 'A participant in the discussion.'))
+            a.setdefault('bio', a.get('personality', ''))
+
+        scenario = {
+            'id': f"custom_{str(uuid.uuid4())[:6]}",
+            'title': scenario_data['title'][:100],
+            'description': scenario_data.get('description', scenario_data['title'])[:300],
+            'objective': scenario_data['objective'][:500],
+            'eval_q': scenario_data.get('eval_q', scenario_data['objective'])[:500],
+            'opening': scenario_data['opening'][:500],
+            'rounds': max(3, min(10, int(scenario_data.get('rounds', 6)))),
+            'agents': agents,
+        }
+
+        session = GameSession(scenario, scenario['rounds'])
+
+        if len(self.sessions) > 200:
+            oldest_key = next(iter(self.sessions))
+            del self.sessions[oldest_key]
+
+        self.sessions[session.id] = session
+        logger.info(f"New custom game: {session.id} title={scenario['title']}")
+        return session
+
     def get_session(self, game_id):
         return self.sessions.get(game_id)
 

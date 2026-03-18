@@ -11,6 +11,10 @@ export function newGame(scenarioId) {
   return service.post('/api/game/new', { scenario_id: scenarioId || null })
 }
 
+export function newCustomGame(scenario) {
+  return service.post('/api/game/new-custom', scenario)
+}
+
 export function getGame(gameId) {
   return service.get(`/api/game/${gameId}`)
 }

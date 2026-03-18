@@ -2,7 +2,12 @@
   <div class="home">
     <nav class="nav">
       <span class="nav-brand">SWARM MIND</span>
-      <a href="https://github.com/666ghj/MiroFish" target="_blank" class="nav-gh">GitHub &nearr;</a>
+      <div class="nav-right">
+        <button class="theme-toggle" @click="toggle" :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+          {{ theme === 'dark' ? '\u2600' : '\u263E' }}
+        </button>
+        <a href="https://github.com/666ghj/MiroFish" target="_blank" class="nav-gh">GitHub &nearr;</a>
+      </div>
     </nav>
 
     <main class="hero">
@@ -18,9 +23,14 @@
           and achieve your <strong>secret objective</strong> before rounds run out.
         </p>
 
-        <router-link to="/game" class="play-btn">
-          PLAY NOW
-        </router-link>
+        <div class="hero-btns">
+          <router-link to="/game" class="play-btn">
+            PLAY NOW
+          </router-link>
+          <router-link to="/create" class="create-btn">
+            CREATE YOUR OWN
+          </router-link>
+        </div>
 
         <div class="features">
           <div class="feat">
@@ -95,20 +105,11 @@
 </template>
 
 <script setup>
+import { useTheme } from '../composables/useTheme.js'
+const { theme, toggle } = useTheme()
 </script>
 
 <style scoped>
-:root {
-  --bg: #06060f;
-  --surface: #0c0c1a;
-  --cyan: #00e5ff;
-  --gold: #ffd740;
-  --text: #e0e0e0;
-  --text2: rgba(255,255,255,0.45);
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Space Grotesk', 'JetBrains Mono', monospace;
-}
-
 .home {
   min-height: 100vh;
   background: var(--bg);
@@ -123,7 +124,7 @@
   align-items: center;
   padding: 0 40px;
   height: 56px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border);
 }
 .nav-brand {
   font-family: var(--sans);
@@ -132,13 +133,18 @@
   color: var(--cyan);
   letter-spacing: 2px;
 }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .nav-gh {
   color: var(--text2);
   text-decoration: none;
   font-size: 12px;
   transition: color 0.2s;
 }
-.nav-gh:hover { color: #fff; }
+.nav-gh:hover { color: var(--heading); }
 
 /* Hero */
 .hero {
@@ -166,11 +172,11 @@
   font-size: 44px;
   font-weight: 700;
   line-height: 1.15;
-  color: #fff;
+  color: var(--heading);
   margin: 0 0 24px;
 }
 .gradient {
-  background: linear-gradient(90deg, var(--cyan), #a78bfa);
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -184,10 +190,17 @@
 }
 .hero-desc strong { color: var(--cyan); }
 
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
 .play-btn {
   display: inline-block;
   background: var(--cyan);
-  color: #000;
+  color: var(--bg);
   text-decoration: none;
   font-family: var(--mono);
   font-size: 14px;
@@ -196,9 +209,24 @@
   border-radius: 6px;
   letter-spacing: 1.5px;
   transition: all 0.2s;
-  margin-bottom: 40px;
 }
 .play-btn:hover { opacity: 0.85; transform: translateY(-2px); }
+
+.create-btn {
+  display: inline-block;
+  background: transparent;
+  color: var(--purple);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 6px;
+  letter-spacing: 1.5px;
+  border: 2px solid var(--purple);
+  transition: all 0.2s;
+}
+.create-btn:hover { background: rgba(192,108,255,0.1); transform: translateY(-2px); }
 
 .features {
   display: flex;
@@ -210,7 +238,7 @@
   font-family: var(--sans);
   font-size: 28px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
 }
 .feat-label {
   font-size: 11px;
@@ -222,7 +250,7 @@
 .card-stack { position: relative; }
 .scenario-preview {
   background: var(--surface);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 28px 24px;
   max-width: 320px;
@@ -246,7 +274,7 @@
   font-family: var(--sans);
   font-size: 17px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   margin-bottom: 8px;
 }
 .sp-desc {
@@ -266,13 +294,13 @@
   max-width: 1100px;
   margin: 0 auto;
   padding: 60px 40px 80px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--border);
 }
 .how-title {
   font-family: var(--sans);
   font-size: 24px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   margin: 0 0 32px;
 }
 .steps {
@@ -282,7 +310,7 @@
 }
 .step {
   background: var(--surface);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 24px 20px;
 }
@@ -297,7 +325,7 @@
 .step-t {
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   margin-bottom: 6px;
 }
 .step-d {
@@ -312,7 +340,7 @@
   padding: 24px;
   font-size: 11px;
   color: var(--text2);
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--border);
 }
 .foot a { color: var(--cyan); text-decoration: none; }
 .foot a:hover { text-decoration: underline; }
@@ -322,5 +350,6 @@
   .hero-side { display: none; }
   .hero-title { font-size: 32px; }
   .steps { grid-template-columns: 1fr 1fr; }
+  .nav { padding: 0 16px; }
 }
 </style>
