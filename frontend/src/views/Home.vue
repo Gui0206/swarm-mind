@@ -4,6 +4,9 @@
     <nav class="navbar">
       <div class="nav-brand">MIROFISH</div>
       <div class="nav-links">
+        <router-link to="/game" class="game-link">
+          SWARM MIND <span class="game-badge">PLAY</span>
+        </router-link>
         <a href="https://github.com/666ghj/MiroFish" target="_blank" class="github-link">
           访问我们的Github主页 <span class="arrow">↗</span>
         </a>
@@ -351,6 +354,32 @@ const startSimulation = () => {
 .nav-links {
   display: flex;
   align-items: center;
+}
+
+.game-link {
+  color: #00e5ff;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 24px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.game-link:hover {
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+}
+.game-badge {
+  background: #00e5ff;
+  color: #000;
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  font-weight: 800;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
 }
 
 .github-link {
