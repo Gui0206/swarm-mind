@@ -76,7 +76,10 @@
     <div v-else class="game-container">
       <!-- HUD -->
       <div class="game-hud">
-        <button class="hud-btn" @click="confirmExit">EXIT</button>
+        <div class="hud-left">
+          <button class="hud-btn" @click="confirmExit">EXIT</button>
+          <a href="https://github.com/Gui0206/swarm-mind" target="_blank" class="hud-gh">Star on GitHub</a>
+        </div>
         <span class="hud-scenario">{{ game?.scenario?.title }}</span>
         <div class="hud-right">
           <span class="hud-round">
@@ -120,6 +123,32 @@
             <div v-if="!visibleMessages.length && !thinking" class="conv-empty">
               Waiting for agents to start the conversation...
             </div>
+
+            <!-- Game Over result (inline) -->
+            <Transition name="fade">
+              <div v-if="phase === 'result' && evaluation" class="result-inline">
+                <div class="result-divider"><span>GAME OVER</span></div>
+                <div class="result-card">
+                  <div class="result-badge" :class="evaluation.achieved ? 'badge-success' : 'badge-fail'">
+                    {{ evaluation.achieved ? 'MISSION COMPLETE' : 'MISSION FAILED' }}
+                  </div>
+                  <div class="result-stars">
+                    <span v-for="i in 3" :key="i" :class="i <= evaluation.stars ? 'star-on' : 'star-off'">
+                      {{ i <= evaluation.stars ? '\u2B50' : '\u2606' }}
+                    </span>
+                  </div>
+                  <div class="result-score">{{ evaluation.score }} / 100</div>
+                  <div class="result-summary">{{ evaluation.summary }}</div>
+                  <div class="result-stats">
+                    {{ game.total_rounds }} rounds &middot; {{ game.whispers_used }} whispers &middot; {{ visibleMessages.length }} messages
+                  </div>
+                  <div class="result-actions">
+                    <button class="rbtn" @click="startGame(game.scenario.id)">RETRY</button>
+                    <button class="rbtn rbtn-alt" @click="backToLobby">ALL SCENARIOS</button>
+                  </div>
+                </div>
+              </div>
+            </Transition>
           </div>
 
           <!-- Whisper Panel -->
@@ -198,33 +227,19 @@
               <span class="wh-msg">{{ w.message }}</span>
             </div>
           </div>
+
+          <!-- Custom game share -->
+          <div v-if="customShareUrl" class="custom-share-box">
+            <div class="cs-label">SHARE THIS CHALLENGE</div>
+            <div class="cs-url-row">
+              <input :value="customShareUrl" readonly class="cs-url-input" @click="$event.target.select()" />
+              <button class="cs-copy-btn" @click="copyCustomLink">{{ customCopied ? 'COPIED!' : 'COPY' }}</button>
+            </div>
+            <div class="cs-hint">Copy link to share this scenario.</div>
+          </div>
         </div>
       </div>
 
-      <!-- ========== RESULTS OVERLAY ========== -->
-      <Transition name="fade">
-        <div v-if="phase === 'result' && evaluation" class="result-overlay">
-          <div class="result-card">
-            <div class="result-badge" :class="evaluation.achieved ? 'badge-success' : 'badge-fail'">
-              {{ evaluation.achieved ? 'MISSION COMPLETE' : 'MISSION FAILED' }}
-            </div>
-            <div class="result-stars">
-              <span v-for="i in 3" :key="i" :class="i <= evaluation.stars ? 'star-on' : 'star-off'">
-                {{ i <= evaluation.stars ? '\u2B50' : '\u2606' }}
-              </span>
-            </div>
-            <div class="result-score">{{ evaluation.score }} / 100</div>
-            <div class="result-summary">{{ evaluation.summary }}</div>
-            <div class="result-stats">
-              {{ game.total_rounds }} rounds &middot; {{ game.whispers_used }} whispers &middot; {{ visibleMessages.length }} messages
-            </div>
-            <div class="result-actions">
-              <button class="rbtn" @click="startGame(game.scenario.id)">RETRY</button>
-              <button class="rbtn rbtn-alt" @click="backToLobby">ALL SCENARIOS</button>
-            </div>
-          </div>
-        </div>
-      </Transition>
     </div>
   </div>
 </template>
@@ -250,6 +265,8 @@ const evaluation = ref(null)
 const error = ref(null)
 const starting = ref(false)
 const convScroll = ref(null)
+const customShareUrl = ref('')
+const customCopied = ref(false)
 
 // --- Computed ---
 const canWhisper = computed(() => {
@@ -305,6 +322,7 @@ onMounted(async () => {
   const custom = decodeCustomHash()
   if (custom) {
     customScenario.value = custom
+    customShareUrl.value = window.location.href
     // Don't load built-in scenarios — show only the custom one
     return
   }
@@ -416,6 +434,8 @@ async function runTick() {
       evaluation.value = result.evaluation
       await delay(1200)
       phase.value = 'result'
+      await nextTick()
+      scrollToBottom()
     }
   } catch (e) {
     thinking.value = false
@@ -444,6 +464,13 @@ function clearCustom() {
   window.location.hash = ''
   // Load built-in scenarios
   gameApi.getScenarios().then(s => { scenarios.value = s }).catch(() => {})
+}
+
+function copyCustomLink() {
+  navigator.clipboard.writeText(customShareUrl.value).then(() => {
+    customCopied.value = true
+    setTimeout(() => { customCopied.value = false }, 2000)
+  })
 }
 
 function scrollToBottom() {
@@ -681,6 +708,25 @@ function delay(ms) {
   height: 28px;
   font-size: 14px;
 }
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-gh {
+  color: var(--gold);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.hud-gh:hover { filter: brightness(1.2); transform: translateY(-1px); }
 
 .game-body {
   flex: 1;
@@ -996,22 +1042,92 @@ function delay(ms) {
 .wh-target::after { content: ':'; }
 .wh-msg { color: var(--text2); }
 
-/* ---- RESULTS OVERLAY ---- */
-.result-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
+/* ---- CUSTOM SHARE BOX ---- */
+.custom-share-box {
+  background: rgba(192,108,255,0.06);
+  border: 1px solid rgba(192,108,255,0.2);
+  border-radius: 8px;
+  padding: 14px;
+}
+.cs-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+.cs-url-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(6,6,15,0.88);
-  backdrop-filter: blur(10px);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.cs-url-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  outline: none;
+  min-width: 0;
+}
+.cs-copy-btn {
+  background: var(--purple);
+  border: none;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.cs-copy-btn:hover { opacity: 0.85; }
+.cs-hint {
+  font-size: 9px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+/* ---- INLINE RESULT ---- */
+.result-inline {
+  margin: 24px 0 40px;
+}
+
+.result-divider {
+  text-align: center;
+  margin: 20px 0 14px;
+  position: relative;
+}
+.result-divider span {
+  background: var(--bg);
+  padding: 0 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold);
+  position: relative;
+  z-index: 1;
+}
+.result-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 1px solid var(--gold);
 }
 
 .result-card {
   text-align: center;
   max-width: 440px;
-  padding: 48px 40px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
 .result-badge {

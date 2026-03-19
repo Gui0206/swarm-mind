@@ -6,7 +6,6 @@
         <button class="theme-toggle" @click="toggle" :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
           {{ theme === 'dark' ? '\u2600' : '\u263E' }}
         </button>
-        <a href="https://github.com/666ghj/MiroFish" target="_blank" class="nav-gh">GitHub &nearr;</a>
       </div>
     </nav>
 
@@ -31,6 +30,8 @@
             CREATE YOUR OWN
           </router-link>
         </div>
+
+        <a href="https://github.com/Gui0206/swarm-mind" target="_blank" class="github-btn">Star on GitHub</a>
 
         <div class="features">
           <div class="feat">
@@ -99,7 +100,7 @@
     </section>
 
     <footer class="foot">
-      <span>Built on <a href="https://github.com/666ghj/MiroFish" target="_blank">MiroFish</a> multi-agent infrastructure</span>
+      <span>Built on <a href="https://github.com/Gui0206/swarm-mind" target="_blank">Swarm Mind</a> multi-agent infrastructure</span>
     </footer>
   </div>
 </template>
@@ -138,13 +139,21 @@ const { theme, toggle } = useTheme()
   align-items: center;
   gap: 12px;
 }
-.nav-gh {
-  color: var(--text2);
+.github-btn {
+  display: inline-block;
+  color: var(--gold);
   text-decoration: none;
-  font-size: 12px;
-  transition: color 0.2s;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 28px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  margin-top: -20px;
+  margin-bottom: 40px;
+  transition: all 0.2s;
 }
-.nav-gh:hover { color: var(--heading); }
+.github-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
 /* Hero */
 .hero {

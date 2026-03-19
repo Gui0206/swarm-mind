@@ -47,7 +47,7 @@
           <label class="field">
             <span class="field-label">Rounds</span>
             <div class="rounds-row">
-              <input v-model.number="form.rounds" type="range" min="3" max="10" class="range-input" />
+              <input v-model.number="form.rounds" type="range" min="3" max="6" class="range-input" />
               <span class="rounds-val">{{ form.rounds }}</span>
             </div>
           </label>
@@ -55,7 +55,7 @@
 
         <!-- Agents -->
         <section class="form-section">
-          <div class="section-label">AGENTS <span class="agent-count">{{ form.agents.length }} / 10</span></div>
+          <div class="section-label">AGENTS <span class="agent-count">{{ form.agents.length }} / 6</span></div>
 
           <div v-for="(agent, i) in form.agents" :key="i" class="agent-form-card">
             <div class="agent-form-header">
@@ -68,7 +68,7 @@
             <textarea v-model="agent.personality" class="field-textarea agent-field" rows="2" placeholder="Personality traits (e.g. Sarcastic, contrarian, always plays devil's advocate)" maxlength="250"></textarea>
           </div>
 
-          <button v-if="form.agents.length < 10" class="add-agent-btn" @click="addAgent">+ ADD AGENT</button>
+          <button v-if="form.agents.length < 6" class="add-agent-btn" @click="addAgent">+ ADD AGENT</button>
         </section>
 
         <!-- Actions -->
@@ -76,7 +76,6 @@
           <div v-if="validationError" class="validation-error">{{ validationError }}</div>
 
           <div class="action-row">
-            <button class="btn-share" @click="generateLink">GENERATE SHARE LINK</button>
             <button class="btn-play" @click="playNow">PLAY NOW</button>
           </div>
         </section>
@@ -96,10 +95,10 @@
             <div class="pc-meta">{{ form.agents.length }} agents &middot; {{ form.rounds }} rounds</div>
           </div>
 
-          <!-- Share modal inline -->
-          <Transition name="fade">
-            <div v-if="shareUrl" class="share-box">
-              <div class="share-label">SHARE LINK</div>
+          <!-- Share box (always visible) -->
+          <div class="share-box">
+            <div class="share-label">SHARE LINK</div>
+            <template v-if="shareUrl">
               <div class="share-url-row">
                 <input :value="shareUrl" readonly class="share-url-input" ref="shareInput" @click="selectShareInput" />
                 <button class="copy-btn" @click="copyLink">{{ copied ? 'COPIED!' : 'COPY' }}</button>
@@ -109,8 +108,9 @@
                 <a :href="twitterShareUrl" target="_blank" class="social-btn social-x">Share on X</a>
                 <a :href="whatsappShareUrl" target="_blank" class="social-btn social-wa">WhatsApp</a>
               </div>
-            </div>
-          </Transition>
+            </template>
+            <div v-else class="share-hint">Fill in the required fields to generate a share link.</div>
+          </div>
         </div>
       </div>
     </main>
@@ -140,14 +140,13 @@ const form = reactive({
   ],
 })
 
-const shareUrl = ref('')
 const copied = ref(false)
 const validationError = ref('')
 const shareInput = ref(null)
 
 // --- Agents ---
 function addAgent() {
-  if (form.agents.length < 10) {
+  if (form.agents.length < 6) {
     form.agents.push({ name: '', emoji: '', personality: '', bio: '' })
   }
 }
@@ -206,18 +205,15 @@ function encodeScenario(compact) {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }
 
-// --- Actions ---
-function generateLink() {
-  const err = validate()
-  if (err) { validationError.value = err; return }
-  validationError.value = ''
-
+// --- Share URL (auto-computed) ---
+const shareUrl = computed(() => {
+  if (validate()) return ''
   const compact = buildCompact()
   const encoded = encodeScenario(compact)
-  shareUrl.value = `${window.location.origin}/game#custom=${encoded}`
-  copied.value = false
-}
+  return `${window.location.origin}/game#custom=${encoded}`
+})
 
+// --- Actions ---
 function playNow() {
   const err = validate()
   if (err) { validationError.value = err; return }
@@ -504,7 +500,7 @@ const whatsappShareUrl = computed(() => {
   display: flex;
   gap: 12px;
 }
-.btn-share, .btn-play {
+.btn-play {
   flex: 1;
   padding: 14px 20px;
   font-family: var(--mono);
@@ -514,15 +510,6 @@ const whatsappShareUrl = computed(() => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-}
-.btn-share {
-  background: transparent;
-  border: 2px solid var(--purple);
-  color: var(--purple);
-}
-.btn-share:hover { background: rgba(192,108,255,0.1); }
-
-.btn-play {
   background: var(--cyan);
   border: 2px solid var(--cyan);
   color: var(--bg);

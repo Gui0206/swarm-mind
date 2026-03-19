@@ -217,8 +217,8 @@ class GameEngine:
                 raise ValueError(f"Missing required field: {field}")
 
         agents = scenario_data['agents']
-        if not isinstance(agents, list) or len(agents) < 2 or len(agents) > 10:
-            raise ValueError("Agents must be a list of 2-10 entries")
+        if not isinstance(agents, list) or len(agents) < 2 or len(agents) > 6:
+            raise ValueError("Agents must be a list of 2-6 entries")
 
         # Normalise agents — generate IDs from names if missing
         for i, a in enumerate(agents):
@@ -236,7 +236,7 @@ class GameEngine:
             'objective': scenario_data['objective'][:500],
             'eval_q': scenario_data.get('eval_q', scenario_data['objective'])[:500],
             'opening': scenario_data['opening'][:500],
-            'rounds': max(3, min(10, int(scenario_data.get('rounds', 6)))),
+            'rounds': max(3, min(6, int(scenario_data.get('rounds', 6)))),
             'agents': agents,
         }
 
