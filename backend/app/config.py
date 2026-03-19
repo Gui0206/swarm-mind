@@ -25,10 +25,13 @@ class Config:
     LLM_BASE_URL = os.environ.get('LLM_BASE_URL', 'https://api.openai.com/v1')
     LLM_MODEL_NAME = os.environ.get('LLM_MODEL_NAME', 'gpt-4o-mini')
 
+    # BYOK: if True, the server key is disabled and users must provide their own
+    SERVER_KEY_DISABLED = os.environ.get('SERVER_KEY_DISABLED', 'false').lower() == 'true'
+
     @classmethod
     def validate(cls):
         """Validate required config."""
         errors = []
-        if not cls.LLM_API_KEY:
+        if not cls.LLM_API_KEY and not cls.SERVER_KEY_DISABLED:
             errors.append("LLM_API_KEY is not configured")
         return errors

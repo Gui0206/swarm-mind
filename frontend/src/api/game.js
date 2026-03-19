@@ -29,3 +29,13 @@ export function whisper(gameId, agentId, message) {
 export function tick(gameId) {
   return service.post(`/api/game/${gameId}/tick`)
 }
+
+/** Exchange an OpenRouter auth code for an API key (via backend proxy). */
+export function exchangeAuthCode(code) {
+  return service.post('/api/auth/exchange', { code })
+}
+
+/** Check if the server LLM key is still active. */
+export function getServerStatus() {
+  return service.get('/api/auth/status')
+}

@@ -3,7 +3,7 @@
     <!-- ========== LOBBY ========== -->
     <div v-if="phase === 'lobby'" class="lobby">
       <div class="lobby-top">
-        <router-link to="/" class="top-back">&larr; MIROFISH</router-link>
+        <router-link to="/" class="top-back">&larr; SWARM MIND</router-link>
         <button class="theme-toggle" @click="toggle" :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
           {{ theme === 'dark' ? '\u2600' : '\u263E' }}
         </button>
@@ -69,6 +69,10 @@
         <button class="random-btn" @click="startGame(null)" :disabled="starting">
           {{ starting ? 'INITIALIZING SWARM...' : 'RANDOM SCENARIO' }}
         </button>
+
+        <div v-if="!isAuthenticated" class="free-counter">
+          {{ freeGamesRemaining }} free game{{ freeGamesRemaining === 1 ? '' : 's' }} remaining
+        </div>
       </template>
     </div>
 
@@ -79,6 +83,7 @@
         <div class="hud-left">
           <button class="hud-btn" @click="confirmExit">EXIT</button>
           <a href="https://github.com/Gui0206/swarm-mind" target="_blank" class="hud-gh">Star on GitHub</a>
+          <span v-if="isAuthenticated" class="hud-byok" title="Using your OpenRouter key">YOUR KEY</span>
         </div>
         <span class="hud-scenario">{{ game?.scenario?.title }}</span>
         <div class="hud-right">
@@ -228,6 +233,13 @@
             </div>
           </div>
 
+          <!-- BYOK disconnect -->
+          <div v-if="isAuthenticated" class="byok-status-box">
+            <div class="bs-label">YOUR API KEY</div>
+            <div class="bs-hint">Using your OpenRouter credits.</div>
+            <button class="bs-disconnect" @click="logout">Disconnect</button>
+          </div>
+
           <!-- Custom game share -->
           <div v-if="customShareUrl" class="custom-share-box">
             <div class="cs-label">SHARE THIS CHALLENGE</div>
@@ -241,15 +253,62 @@
       </div>
 
     </div>
+
+    <!-- ========== BYOK MODAL ========== -->
+    <Transition name="fade">
+      <div v-if="showByokModal" class="byok-overlay" @click.self="dismissByokModal">
+        <div class="byok-modal">
+          <div class="byok-emoji">{{ freeQuotaExceeded ? '&#x1F3AE;' : '&#x1F680;' }}</div>
+          <div class="byok-title">{{ freeQuotaExceeded ? 'Free Games Used Up' : 'Quota Exceeded' }}</div>
+          <p class="byok-msg">
+            <template v-if="freeQuotaExceeded">
+              You've played your 5 free games!
+              Log in with OpenRouter to keep playing using your own credits.
+            </template>
+            <template v-else>
+              Wow, we went viral! Our free server quota is over.
+              Log in with OpenRouter to keep playing using your own credits.
+            </template>
+          </p>
+          <button class="byok-btn" @click="login">
+            Connect with OpenRouter
+          </button>
+          <div class="byok-hint">
+            You'll be redirected to OpenRouter to authorize access. No passwords are shared with us.
+          </div>
+          <button class="byok-dismiss" @click="dismissByokModal">maybe later</button>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import * as gameApi from '../api/game.js'
 import { useTheme } from '../composables/useTheme.js'
+import { useAuth } from '../composables/useAuth.js'
 
 const { theme, toggle } = useTheme()
+const {
+  isAuthenticated,
+  showByokModal,
+  freeGamesRemaining,
+  freeQuotaExceeded,
+  canStartGame,
+  recordGamePlayed,
+  login,
+  dismissByokModal,
+  triggerByokModal,
+  logout,
+} = useAuth()
+
+// Listen for quota-exceeded events from the API interceptor
+function onQuotaExceeded() {
+  triggerByokModal()
+}
+onMounted(() => window.addEventListener('quota-exceeded', onQuotaExceeded))
+onUnmounted(() => window.removeEventListener('quota-exceeded', onQuotaExceeded))
 
 // --- State ---
 const phase = ref('lobby') // lobby | playing | result
@@ -336,6 +395,7 @@ onMounted(async () => {
 
 // --- Game Flow ---
 async function startGame(scenarioId) {
+  if (!canStartGame()) return
   try {
     error.value = null
     starting.value = true
@@ -347,6 +407,7 @@ async function startGame(scenarioId) {
     evaluation.value = null
 
     game.value = await gameApi.newGame(scenarioId)
+    recordGamePlayed()
 
     // Auto-run round 1 (observation round — no whisper opportunity)
     await runTick()
@@ -361,6 +422,7 @@ async function startGame(scenarioId) {
 
 async function startCustomGame() {
   if (!customScenario.value) return
+  if (!canStartGame()) return
   try {
     error.value = null
     starting.value = true
@@ -372,6 +434,7 @@ async function startCustomGame() {
     evaluation.value = null
 
     game.value = await gameApi.newCustomGame(customScenario.value)
+    recordGamePlayed()
 
     await runTick()
     starting.value = false
@@ -648,6 +711,15 @@ function delay(ms) {
   transition: color 0.2s;
 }
 .browse-link:hover { color: var(--cyan); }
+
+/* ---- FREE GAME COUNTER ---- */
+.free-counter {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.5px;
+}
 
 /* ---- GAME LAYOUT ---- */
 .game-container {
@@ -1236,6 +1308,9 @@ function delay(ms) {
 }
 
 @media (max-width: 480px) {
+  .byok-modal { padding: 28px 20px; }
+  .byok-title { font-size: 18px; }
+  .byok-msg { font-size: 13px; }
   .lobby { padding: 20px 12px; }
   .lobby-title { font-size: 28px; }
   .lobby-tagline { font-size: 14px; }
@@ -1256,6 +1331,129 @@ function delay(ms) {
   .scenario-card { padding: 16px 14px; }
   .random-btn { font-size: 12px; padding: 14px; }
 }
+
+/* ---- BYOK MODAL ---- */
+.byok-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.byok-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 40px 36px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.byok-emoji {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.byok-title {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--heading);
+  margin-bottom: 14px;
+}
+
+.byok-msg {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+.byok-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--cyan);
+  color: var(--bg);
+  border: none;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-bottom: 14px;
+}
+.byok-btn:hover { opacity: 0.85; }
+
+.byok-hint {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.byok-dismiss {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.byok-dismiss:hover { color: var(--text); }
+
+/* ---- BYOK HUD BADGE ---- */
+.hud-byok {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* ---- BYOK STATUS BOX (sidebar) ---- */
+.byok-status-box {
+  background: rgba(105,240,174,0.06);
+  border: 1px solid rgba(105,240,174,0.2);
+  border-radius: 8px;
+  padding: 14px;
+}
+.bs-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  margin-bottom: 6px;
+}
+.bs-hint {
+  font-size: 10px;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.bs-disconnect {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bs-disconnect:hover { color: var(--red); border-color: var(--red); }
 
 /* Scrollbar */
 .conv-scroll::-webkit-scrollbar,

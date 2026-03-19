@@ -43,8 +43,9 @@ def create_app(config_class=Config):
         return response
 
     # Register blueprints
-    from .api import game_bp
+    from .api import game_bp, auth_bp
     app.register_blueprint(game_bp, url_prefix='/api/game')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     @app.route('/health')
     def health():

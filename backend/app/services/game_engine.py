@@ -274,12 +274,14 @@ class GameEngine:
         logger.info(f"Game {game_id}: whisper to {agent_id}")
         return {'success': True, 'whispers_used': session.whispers_used}
 
-    def tick(self, game_id):
+    def tick(self, game_id, llm_override=None):
         session = self.sessions.get(game_id)
         if not session:
             raise ValueError("Game not found")
         if session.state == 'finished':
             raise ValueError("Game already finished")
+
+        llm = llm_override or self.llm
 
         session.current_round += 1
         session.state = 'processing'
@@ -290,7 +292,7 @@ class GameEngine:
 
         for agent in speakers:
             try:
-                content = self._generate_msg(session, agent)
+                content = self._generate_msg(session, agent, llm)
             except Exception as e:
                 logger.error(f"LLM error for {agent['name']}: {e}")
                 content = "*stays quiet for a moment*"
@@ -315,7 +317,7 @@ class GameEngine:
 
         if game_over:
             try:
-                evaluation = self._evaluate(session)
+                evaluation = self._evaluate(session, llm)
             except Exception as e:
                 logger.error(f"Evaluation error: {e}")
                 evaluation = {
@@ -357,7 +359,8 @@ class GameEngine:
         random.shuffle(speakers)
         return speakers
 
-    def _generate_msg(self, session, agent):
+    def _generate_msg(self, session, agent, llm=None):
+        llm = llm or self.llm
         whisper = session.active_whispers.get(agent['id'])
         other_names = ', '.join(a['name'] for a in session.agents if a['id'] != agent['id'])
 
@@ -403,7 +406,7 @@ class GameEngine:
                 "content": f"The discussion just started. Give your opening take as {agent['name']} (1-2 sentences):"
             })
 
-        content = self.llm.chat(messages=msgs, temperature=0.9, max_tokens=80)
+        content = llm.chat(messages=msgs, temperature=0.9, max_tokens=80)
 
         # Clean up common LLM artifacts
         content = content.strip().strip('"').strip("'")
@@ -416,7 +419,8 @@ class GameEngine:
 
         return content.strip()
 
-    def _evaluate(self, session):
+    def _evaluate(self, session, llm=None):
+        llm = llm or self.llm
         conv = "\n".join(f"{m['agent_name']}: {m['content']}" for m in session.messages)
         whisper_summary = f"The player used {session.whispers_used} whispers across {session.total_rounds} rounds."
 
@@ -434,7 +438,7 @@ class GameEngine:
             '"summary": "<2-3 sentence witty recap of what happened>"}'
         )
 
-        result = self.llm.chat_json(
+        result = llm.chat_json(
             messages=[
                 {"role": "system", "content": "You are a witty, entertaining game judge. Respond with JSON only."},
                 {"role": "user", "content": prompt}
