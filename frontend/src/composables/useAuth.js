@@ -8,6 +8,7 @@ import { ref, computed } from 'vue'
 const STORAGE_KEY = 'openrouter_user_key'
 const GAMES_KEY = 'free_games_played'
 const FREE_GAME_LIMIT = 5
+const IS_DEV = import.meta.env.DEV
 
 // Shared reactive state (module-level so all consumers share it)
 const userKey = ref(localStorage.getItem(STORAGE_KEY) || '')
@@ -15,9 +16,10 @@ const gamesPlayed = ref(parseInt(localStorage.getItem(GAMES_KEY), 10) || 0)
 const showByokModal = ref(false)
 
 export function useAuth() {
-  const isAuthenticated = computed(() => !!userKey.value)
-  const freeGamesRemaining = computed(() => Math.max(0, FREE_GAME_LIMIT - gamesPlayed.value))
-  const freeQuotaExceeded = computed(() => gamesPlayed.value >= FREE_GAME_LIMIT && !isAuthenticated.value)
+  // In dev mode, act as if always authenticated (bypass limit & auth)
+  const isAuthenticated = computed(() => IS_DEV || !!userKey.value)
+  const freeGamesRemaining = computed(() => IS_DEV ? Infinity : Math.max(0, FREE_GAME_LIMIT - gamesPlayed.value))
+  const freeQuotaExceeded = computed(() => IS_DEV ? false : (gamesPlayed.value >= FREE_GAME_LIMIT && !userKey.value))
 
   /**
    * Gate check — call before starting a game.
@@ -60,6 +62,7 @@ export function useAuth() {
 
   /** Call from the response interceptor when 402 is received. */
   function triggerByokModal() {
+    if (IS_DEV) return
     showByokModal.value = true
   }
 

@@ -70,9 +70,6 @@
           {{ starting ? 'INITIALIZING SWARM...' : 'RANDOM SCENARIO' }}
         </button>
 
-        <div v-if="!isAuthenticated" class="free-counter">
-          {{ freeGamesRemaining }} free game{{ freeGamesRemaining === 1 ? '' : 's' }} remaining
-        </div>
       </template>
     </div>
 
