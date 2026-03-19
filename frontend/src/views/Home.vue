@@ -11,12 +11,13 @@
 
     <main class="hero">
       <div class="hero-content">
-        <p class="hero-tag">LLM Agent Game</p>
+        <p class="hero-tag">{{ t('home.tag') || 'LLM Agent Game' }}</p>
         <h1 class="hero-title">
-          Whisper to the swarm.<br />
-          <span class="gradient">Shape reality.</span>
+          {{ t('home.title1') || 'Whisper to the swarm.' }}<br />
+          <span class="gradient">{{ t('home.title2') || 'Shape reality.' }}</span>
         </h1>
-        <p class="hero-desc">
+        <p class="hero-desc" v-if="isPtBr" v-html="t('home.desc')"></p>
+        <p class="hero-desc" v-else>
           You're a hidden manipulator in a room of AI agents. Each has a unique personality,
           opinions, and goals. <strong>Whisper</strong> to any agent to steer the conversation
           and achieve your <strong>secret objective</strong> before rounds run out.
@@ -24,10 +25,10 @@
 
         <div class="hero-btns">
           <router-link to="/game" class="play-btn">
-            PLAY NOW
+            {{ t('home.play') || 'PLAY NOW' }}
           </router-link>
           <router-link to="/create" class="create-btn">
-            CREATE YOUR OWN
+            {{ t('home.create') || 'CREATE YOUR OWN' }}
           </router-link>
         </div>
 
@@ -36,15 +37,15 @@
         <div class="features">
           <div class="feat">
             <span class="feat-num">6</span>
-            <span class="feat-label">Scenarios</span>
+            <span class="feat-label">{{ t('home.scenarios') || 'Scenarios' }}</span>
           </div>
           <div class="feat">
-            <span class="feat-num">36</span>
-            <span class="feat-label">Unique Agents</span>
+            <span class="feat-num">22</span>
+            <span class="feat-label">{{ t('home.agents') || 'Unique Agents' }}</span>
           </div>
           <div class="feat">
             <span class="feat-num">&infin;</span>
-            <span class="feat-label">Replayability</span>
+            <span class="feat-label">{{ t('home.replayability') || 'Replayability' }}</span>
           </div>
         </div>
       </div>
@@ -52,21 +53,21 @@
       <div class="hero-side">
         <div class="card-stack">
           <div class="scenario-preview">
-            <div class="sp-label">SCENARIO</div>
-            <div class="sp-title">The Pineapple Ultimatum</div>
-            <div class="sp-desc">Convince the entire office that pineapple pizza is the way to go.</div>
+            <div class="sp-label">{{ isPtBr ? 'CENÁRIO' : 'SCENARIO' }}</div>
+            <div class="sp-title">{{ isPtBr ? 'O Ultimato do Abacaxi' : 'The Pineapple Ultimatum' }}</div>
+            <div class="sp-desc">{{ t('home.preview.desc1') || 'Convince the entire office that pineapple pizza is the way to go.' }}</div>
             <div class="sp-agents">
               <span>&#x1F454;</span><span>&#x1F3A8;</span><span>&#x1F4AA;</span>
-              <span>&#x1F4CA;</span><span>&#x1F468;&#x200D;&#x1F373;</span><span>&#x1F634;</span>
+              <span>&#x1F468;&#x200D;&#x1F373;</span>
             </div>
           </div>
           <div class="scenario-preview sp2">
-            <div class="sp-label">SCENARIO</div>
-            <div class="sp-title">Operation: Flat Earth</div>
-            <div class="sp-desc">Make scientists doubt the shape of the Earth at a cocktail party.</div>
+            <div class="sp-label">{{ isPtBr ? 'CENÁRIO' : 'SCENARIO' }}</div>
+            <div class="sp-title">{{ isPtBr ? 'Los Hermanos no Churrasco' : 'The BBQ Playlist Battle' }}</div>
+            <div class="sp-desc">{{ t('home.preview.desc2') || 'Convince everyone at the BBQ to play Los Hermanos.' }}</div>
             <div class="sp-agents">
-              <span>&#x1F52D;</span><span>&#x1F30D;</span><span>&#x1F9EA;</span>
-              <span>&#x1F4BB;</span><span>&#x1F4E1;</span><span>&#x1F393;</span>
+              <span>&#x1F920;</span><span>&#x1F3B8;</span><span>&#x1F3A7;</span>
+              <span>&#x1F389;</span>
             </div>
           </div>
         </div>
@@ -74,27 +75,27 @@
     </main>
 
     <section class="how">
-      <h2 class="how-title">How It Works</h2>
+      <h2 class="how-title">{{ t('home.how') || 'How It Works' }}</h2>
       <div class="steps">
         <div class="step">
           <span class="step-n">01</span>
-          <div class="step-t">Choose a Scenario</div>
-          <div class="step-d">Pick a mission with unique agents and a secret objective.</div>
+          <div class="step-t">{{ t('home.step1.t') || 'Choose a Scenario' }}</div>
+          <div class="step-d">{{ t('home.step1.d') || 'Pick a mission with unique agents and a secret objective.' }}</div>
         </div>
         <div class="step">
           <span class="step-n">02</span>
-          <div class="step-t">Observe & Whisper</div>
-          <div class="step-d">Watch agents debate, then whisper to one to influence the conversation.</div>
+          <div class="step-t">{{ t('home.step2.t') || 'Observe & Whisper' }}</div>
+          <div class="step-d">{{ t('home.step2.d') || 'Watch agents debate, then whisper to one to influence the conversation.' }}</div>
         </div>
         <div class="step">
           <span class="step-n">03</span>
-          <div class="step-t">Shape the Outcome</div>
-          <div class="step-d">Each agent reacts with real LLM intelligence. Manipulate the swarm mind.</div>
+          <div class="step-t">{{ t('home.step3.t') || 'Shape the Outcome' }}</div>
+          <div class="step-d">{{ t('home.step3.d') || 'Each agent reacts with real LLM intelligence. Manipulate the swarm mind.' }}</div>
         </div>
         <div class="step">
           <span class="step-n">04</span>
-          <div class="step-t">Get Judged</div>
-          <div class="step-d">An AI judge scores how well you achieved your objective.</div>
+          <div class="step-t">{{ t('home.step4.t') || 'Get Judged' }}</div>
+          <div class="step-d">{{ t('home.step4.d') || 'An AI judge scores how well you achieved your objective.' }}</div>
         </div>
       </div>
     </section>
@@ -107,7 +108,9 @@
 
 <script setup>
 import { useTheme } from '../composables/useTheme.js'
+import { useLocale } from '../composables/useLocale.js'
 const { theme, toggle } = useTheme()
+const { isPtBr, t } = useLocale()
 </script>
 
 <style scoped>

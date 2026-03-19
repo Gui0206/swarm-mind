@@ -13,6 +13,13 @@ from ..utils.logger import get_logger
 logger = get_logger('mirofish.game.api')
 
 
+def _get_locale():
+    """Extract locale from Accept-Language header."""
+    lang = request.headers.get('Accept-Language', 'en')
+    # Parse first language tag (e.g. "pt-BR,pt;q=0.9,en;q=0.8" → "pt-BR")
+    return lang.split(',')[0].strip()
+
+
 def _get_llm_override():
     """Build an LLM client from the user's BYOK key, or None to use server key."""
     user_key = request.headers.get('X-User-LLM-Key')
@@ -30,7 +37,8 @@ def _get_llm_override():
 def list_scenarios():
     """List available game scenarios."""
     engine = get_engine()
-    return jsonify(engine.get_scenarios())
+    locale = _get_locale()
+    return jsonify(engine.get_scenarios(locale=locale))
 
 
 @game_bp.route('/new', methods=['POST'])
@@ -39,7 +47,8 @@ def new_game():
     try:
         data = request.get_json(silent=True) or {}
         engine = get_engine()
-        session = engine.new_game(data.get('scenario_id'))
+        locale = _get_locale()
+        session = engine.new_game(data.get('scenario_id'), locale=locale)
         return jsonify(session.to_dict())
     except ValueError as e:
         return jsonify({'error': str(e)}), 400

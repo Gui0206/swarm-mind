@@ -11,8 +11,9 @@
 
       <div class="lobby-header">
         <h1 class="lobby-title">SWARM MIND</h1>
-        <p class="lobby-tagline">Whisper to the swarm. Shape reality.</p>
-        <p class="lobby-desc">
+        <p class="lobby-tagline">{{ t('lobby.tagline') || 'Whisper to the swarm. Shape reality.' }}</p>
+        <p class="lobby-desc" v-if="isPtBr" v-html="t('lobby.desc')"></p>
+        <p class="lobby-desc" v-else>
           You're a hidden manipulator in a group of AI agents. Each has a unique personality.
           <strong>Whisper</strong> to any agent to influence the conversation and achieve your
           <strong>secret objective</strong> before the rounds run out.
@@ -23,7 +24,7 @@
 
       <!-- Custom scenario from shared link -->
       <template v-if="customScenario">
-        <div class="custom-banner">CUSTOM SCENARIO</div>
+        <div class="custom-banner">{{ t('lobby.custom') || 'CUSTOM SCENARIO' }}</div>
         <div class="scenario-grid">
           <button
             class="scenario-card scenario-card-custom"
@@ -34,7 +35,7 @@
             <div class="sc-desc">{{ customScenario.description }}</div>
             <div class="sc-meta">
               <span class="sc-obj">{{ customScenario.objective }}</span>
-              <span class="sc-agents">{{ customScenario.agents.length }} agents</span>
+              <span class="sc-agents">{{ customScenario.agents.length }} {{ t('lobby.agents_count') || 'agents' }}</span>
             </div>
             <div class="sc-agent-emojis">
               <span v-for="(a, i) in customScenario.agents" :key="i">{{ a.emoji }}</span>
@@ -42,9 +43,9 @@
           </button>
         </div>
         <button class="random-btn" @click="startCustomGame()" :disabled="starting">
-          {{ starting ? 'INITIALIZING SWARM...' : 'PLAY THIS CHALLENGE' }}
+          {{ starting ? (t('lobby.initializing') || 'INITIALIZING SWARM...') : (t('lobby.play_custom') || 'PLAY THIS CHALLENGE') }}
         </button>
-        <router-link to="/game" class="browse-link" @click.native="clearCustom">or browse all scenarios</router-link>
+        <router-link to="/game" class="browse-link" @click.native="clearCustom">{{ t('lobby.browse') || 'or browse all scenarios' }}</router-link>
       </template>
 
       <!-- Normal scenario grid -->
@@ -61,13 +62,13 @@
             <div class="sc-desc">{{ s.description }}</div>
             <div class="sc-meta">
               <span class="sc-obj">{{ s.objective }}</span>
-              <span class="sc-agents">{{ s.agent_count }} agents</span>
+              <span class="sc-agents">{{ s.agent_count }} {{ t('lobby.agents_count') || 'agents' }}</span>
             </div>
           </button>
         </div>
 
         <button class="random-btn" @click="startGame(null)" :disabled="starting">
-          {{ starting ? 'INITIALIZING SWARM...' : 'RANDOM SCENARIO' }}
+          {{ starting ? (t('lobby.initializing') || 'INITIALIZING SWARM...') : (t('lobby.random') || 'RANDOM SCENARIO') }}
         </button>
 
       </template>
@@ -78,14 +79,14 @@
       <!-- HUD -->
       <div class="game-hud">
         <div class="hud-left">
-          <button class="hud-btn" @click="confirmExit">EXIT</button>
+          <button class="hud-btn" @click="confirmExit">{{ t('hud.exit') || 'EXIT' }}</button>
           <a href="https://github.com/Gui0206/swarm-mind" target="_blank" class="hud-gh">Star on GitHub</a>
-          <span v-if="isAuthenticated" class="hud-byok" title="Using your OpenRouter key">YOUR KEY</span>
+          <span v-if="isAuthenticated" class="hud-byok" :title="isPtBr ? 'Usando sua chave OpenRouter' : 'Using your OpenRouter key'">{{ t('hud.your_key') || 'YOUR KEY' }}</span>
         </div>
         <span class="hud-scenario">{{ game?.scenario?.title }}</span>
         <div class="hud-right">
           <span class="hud-round">
-            ROUND {{ game?.current_round || 0 }} / {{ game?.total_rounds || 0 }}
+            {{ t('hud.round') || 'ROUND' }} {{ game?.current_round || 0 }} / {{ game?.total_rounds || 0 }}
           </span>
           <button class="theme-toggle theme-toggle-sm" @click="toggle">
             {{ theme === 'dark' ? '\u2600' : '\u263E' }}
@@ -100,7 +101,7 @@
             <template v-for="(msg, i) in visibleMessages" :key="i">
               <!-- Round divider -->
               <div v-if="i === 0 || visibleMessages[i-1]?.round !== msg.round" class="round-divider">
-                <span>ROUND {{ msg.round }}</span>
+                <span>{{ t('hud.round') || 'ROUND' }} {{ msg.round }}</span>
               </div>
               <!-- Message -->
               <div class="msg" :class="{ 'msg-whispered': msg.is_whispered }">
@@ -108,7 +109,7 @@
                 <div class="msg-body">
                   <span class="msg-name" :class="{ 'whispered-name': msg.is_whispered }">
                     {{ msg.agent_name }}
-                    <span v-if="msg.is_whispered" class="whisper-badge" title="Influenced by your whisper">whispered</span>
+                    <span v-if="msg.is_whispered" class="whisper-badge" :title="isPtBr ? 'Influenciado pelo seu sussurro' : 'Influenced by your whisper'">{{ t('conv.whispered') || 'whispered' }}</span>
                   </span>
                   <span class="msg-text">{{ msg.content }}</span>
                 </div>
@@ -118,21 +119,21 @@
             <!-- Thinking indicator -->
             <div v-if="thinking" class="thinking-box">
               <div class="thinking-dots"><span></span><span></span><span></span></div>
-              <span>Agents are discussing...</span>
+              <span>{{ t('conv.thinking') || 'Agents are discussing...' }}</span>
             </div>
 
             <!-- Empty state -->
             <div v-if="!visibleMessages.length && !thinking" class="conv-empty">
-              Waiting for agents to start the conversation...
+              {{ t('conv.waiting') || 'Waiting for agents to start the conversation...' }}
             </div>
 
             <!-- Game Over result (inline) -->
             <Transition name="fade">
               <div v-if="phase === 'result' && evaluation" class="result-inline">
-                <div class="result-divider"><span>GAME OVER</span></div>
+                <div class="result-divider"><span>{{ t('conv.game_over') || 'GAME OVER' }}</span></div>
                 <div class="result-card">
                   <div class="result-badge" :class="evaluation.achieved ? 'badge-success' : 'badge-fail'">
-                    {{ evaluation.achieved ? 'MISSION COMPLETE' : 'MISSION FAILED' }}
+                    {{ evaluation.achieved ? (t('conv.mission_complete') || 'MISSION COMPLETE') : (t('conv.mission_failed') || 'MISSION FAILED') }}
                   </div>
                   <div class="result-stars">
                     <span v-for="i in 3" :key="i" :class="i <= evaluation.stars ? 'star-on' : 'star-off'">
@@ -142,11 +143,11 @@
                   <div class="result-score">{{ evaluation.score }} / 100</div>
                   <div class="result-summary">{{ evaluation.summary }}</div>
                   <div class="result-stats">
-                    {{ game.total_rounds }} rounds &middot; {{ game.whispers_used }} whispers &middot; {{ visibleMessages.length }} messages
+                    {{ game.total_rounds }} {{ t('conv.rounds') || 'rounds' }} &middot; {{ game.whispers_used }} {{ t('conv.whispers') || 'whispers' }} &middot; {{ visibleMessages.length }} {{ t('conv.messages') || 'messages' }}
                   </div>
                   <div class="result-actions">
-                    <button class="rbtn" @click="startGame(game.scenario.id)">RETRY</button>
-                    <button class="rbtn rbtn-alt" @click="backToLobby">ALL SCENARIOS</button>
+                    <button class="rbtn" @click="startGame(game.scenario.id)">{{ t('conv.retry') || 'RETRY' }}</button>
+                    <button class="rbtn rbtn-alt" @click="backToLobby">{{ t('conv.all_scenarios') || 'ALL SCENARIOS' }}</button>
                   </div>
                 </div>
               </div>
@@ -156,9 +157,9 @@
           <!-- Whisper Panel -->
           <div v-if="canWhisper" class="whisper-panel">
             <div class="whisper-row">
-              <span class="whisper-label">WHISPER TO</span>
+              <span class="whisper-label">{{ t('whisper.to') || 'WHISPER TO' }}</span>
               <select v-model="selectedAgentId" class="agent-select">
-                <option value="">Select an agent...</option>
+                <option value="">{{ t('whisper.select') || 'Select an agent...' }}</option>
                 <option v-for="a in game.agents" :key="a.id" :value="a.id">
                   {{ a.emoji }} {{ a.name }}
                 </option>
@@ -168,15 +169,15 @@
               v-model="whisperText"
               class="whisper-input"
               :placeholder="selectedAgentId
-                ? `Only ${selectedAgentName} will hear this...`
-                : 'Select an agent first, then type your whisper...'"
+                ? (isPtBr ? `Só ${selectedAgentName} ${t('whisper.placeholder')}` : `Only ${selectedAgentName} will hear this...`)
+                : (t('whisper.placeholder_empty') || 'Select an agent first, then type your whisper...')"
               rows="2"
               :disabled="!selectedAgentId"
               @keydown.enter.ctrl="advance"
             ></textarea>
             <div class="whisper-actions">
               <button class="btn-advance" @click="advance" :disabled="thinking || animating">
-                {{ whisperText.trim() && selectedAgentId ? 'SEND WHISPER & CONTINUE' : 'SKIP & CONTINUE' }}
+                {{ whisperText.trim() && selectedAgentId ? (t('whisper.send') || 'SEND WHISPER & CONTINUE') : (t('whisper.skip') || 'SKIP & CONTINUE') }}
               </button>
             </div>
           </div>
@@ -188,12 +189,12 @@
         <!-- Sidebar -->
         <div class="sidebar">
           <div class="obj-card">
-            <div class="obj-label">MISSION</div>
+            <div class="obj-label">{{ t('sidebar.mission') || 'MISSION' }}</div>
             <div class="obj-text">{{ game?.scenario?.objective }}</div>
           </div>
 
           <div class="agents-section">
-            <div class="agents-label">SWARM AGENTS</div>
+            <div class="agents-label">{{ t('sidebar.agents') || 'SWARM AGENTS' }}</div>
             <div
               v-for="a in game?.agents"
               :key="a.id"
@@ -211,18 +212,18 @@
 
           <div class="stats-section">
             <div class="stat-row">
-              <span>Whispers used</span>
+              <span>{{ t('sidebar.whispers_used') || 'Whispers used' }}</span>
               <span class="stat-val">{{ game?.whispers_used || 0 }}</span>
             </div>
             <div class="stat-row">
-              <span>Messages</span>
+              <span>{{ t('sidebar.messages') || 'Messages' }}</span>
               <span class="stat-val">{{ visibleMessages.length }}</span>
             </div>
           </div>
 
           <!-- Whisper History -->
           <div v-if="game?.whisper_log?.length" class="whisper-history">
-            <div class="wh-label">YOUR WHISPERS</div>
+            <div class="wh-label">{{ t('sidebar.your_whispers') || 'YOUR WHISPERS' }}</div>
             <div v-for="(w, i) in game.whisper_log" :key="i" class="wh-item">
               <span class="wh-round">R{{ w.round }}</span>
               <span class="wh-target">{{ w.agent_name }}</span>
@@ -232,19 +233,19 @@
 
           <!-- BYOK disconnect -->
           <div v-if="isAuthenticated" class="byok-status-box">
-            <div class="bs-label">YOUR API KEY</div>
-            <div class="bs-hint">Using your OpenRouter credits.</div>
-            <button class="bs-disconnect" @click="logout">Disconnect</button>
+            <div class="bs-label">{{ t('sidebar.your_key') || 'YOUR API KEY' }}</div>
+            <div class="bs-hint">{{ t('sidebar.key_hint') || 'Using your OpenRouter credits.' }}</div>
+            <button class="bs-disconnect" @click="logout">{{ t('sidebar.disconnect') || 'Disconnect' }}</button>
           </div>
 
           <!-- Custom game share -->
           <div v-if="customShareUrl" class="custom-share-box">
-            <div class="cs-label">SHARE THIS CHALLENGE</div>
+            <div class="cs-label">{{ t('sidebar.share') || 'SHARE THIS CHALLENGE' }}</div>
             <div class="cs-url-row">
               <input :value="customShareUrl" readonly class="cs-url-input" @click="$event.target.select()" />
-              <button class="cs-copy-btn" @click="copyCustomLink">{{ customCopied ? 'COPIED!' : 'COPY' }}</button>
+              <button class="cs-copy-btn" @click="copyCustomLink">{{ customCopied ? (t('sidebar.copied') || 'COPIED!') : (t('sidebar.copy') || 'COPY') }}</button>
             </div>
-            <div class="cs-hint">Copy link to share this scenario.</div>
+            <div class="cs-hint">{{ t('sidebar.share_hint') || 'Copy link to share this scenario.' }}</div>
           </div>
         </div>
       </div>
@@ -256,24 +257,22 @@
       <div v-if="showByokModal" class="byok-overlay" @click.self="dismissByokModal">
         <div class="byok-modal">
           <div class="byok-emoji">{{ freeQuotaExceeded ? '&#x1F3AE;' : '&#x1F680;' }}</div>
-          <div class="byok-title">{{ freeQuotaExceeded ? 'Free Games Used Up' : 'Quota Exceeded' }}</div>
+          <div class="byok-title">{{ freeQuotaExceeded ? (t('byok.used_up') || 'Free Games Used Up') : (t('byok.quota') || 'Quota Exceeded') }}</div>
           <p class="byok-msg">
             <template v-if="freeQuotaExceeded">
-              You've played your 5 free games!
-              Log in with OpenRouter to keep playing using your own credits.
+              {{ t('byok.msg_free') || "You've played your 5 free games! Log in with OpenRouter to keep playing using your own credits." }}
             </template>
             <template v-else>
-              Wow, we went viral! Our free server quota is over.
-              Log in with OpenRouter to keep playing using your own credits.
+              {{ t('byok.msg_quota') || "Wow, we went viral! Our free server quota is over. Log in with OpenRouter to keep playing using your own credits." }}
             </template>
           </p>
           <button class="byok-btn" @click="login">
-            Connect with OpenRouter
+            {{ t('byok.connect') || 'Connect with OpenRouter' }}
           </button>
           <div class="byok-hint">
-            You'll be redirected to OpenRouter to authorize access. No passwords are shared with us.
+            {{ t('byok.hint') || "You'll be redirected to OpenRouter to authorize access. No passwords are shared with us." }}
           </div>
-          <button class="byok-dismiss" @click="dismissByokModal">maybe later</button>
+          <button class="byok-dismiss" @click="dismissByokModal">{{ t('byok.later') || 'maybe later' }}</button>
         </div>
       </div>
     </Transition>
@@ -285,8 +284,10 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import * as gameApi from '../api/game.js'
 import { useTheme } from '../composables/useTheme.js'
 import { useAuth } from '../composables/useAuth.js'
+import { useLocale } from '../composables/useLocale.js'
 
 const { theme, toggle } = useTheme()
+const { isPtBr, t } = useLocale()
 const {
   isAuthenticated,
   showByokModal,

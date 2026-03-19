@@ -2,6 +2,9 @@ import axios from 'axios'
 
 const STORAGE_KEY = 'openrouter_user_key'
 
+// Detect system language once at startup
+const systemLang = navigator.language || navigator.userLanguage || 'en'
+
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
   timeout: 300000,
@@ -10,13 +13,14 @@ const service = axios.create({
   }
 })
 
-// Attach user BYOK key on every request (if available)
+// Attach user BYOK key and system language on every request
 service.interceptors.request.use(
   config => {
     const key = localStorage.getItem(STORAGE_KEY)
     if (key) {
       config.headers['X-User-LLM-Key'] = key
     }
+    config.headers['Accept-Language'] = systemLang
     return config
   },
   error => {
