@@ -1198,23 +1198,63 @@ function delay(ms) {
 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 800px) {
-  .game-body { flex-direction: column; }
+  .game-container { height: auto; min-height: 100vh; overflow: visible; }
+  .game-body { flex-direction: column; overflow: visible; }
+  .game-hud { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
+  .hud-scenario {
+    order: 3;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .hud-gh { display: none; }
+  .conv-scroll { padding: 16px; }
+  .conv-panel { min-height: 50vh; }
   .sidebar {
     width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px;
     border-left: none;
     border-top: 1px solid var(--border);
-    max-height: 200px;
-    overflow-y: auto;
+    overflow-y: visible;
+    max-height: none;
   }
-  .obj-card { flex: 1 1 100%; }
-  .agents-section { flex: 1 1 100%; }
+  .whisper-panel { padding: 12px 16px; }
+  .whisper-row { flex-wrap: wrap; }
+  .agent-select { min-width: 0; }
+  .btn-advance { width: 100%; text-align: center; }
+  .whisper-actions { width: 100%; }
   .scenario-grid { grid-template-columns: 1fr; }
   .lobby { padding: 30px 16px; }
   .lobby-title { font-size: 36px; }
+  .result-card { padding: 24px 16px; }
+  .result-badge { font-size: 20px; }
+  .result-score { font-size: 32px; }
+  .result-stars { font-size: 28px; }
+  .result-actions { flex-direction: column; }
+  .rbtn { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .lobby { padding: 20px 12px; }
+  .lobby-title { font-size: 28px; }
+  .lobby-tagline { font-size: 14px; }
+  .lobby-desc { font-size: 13px; }
+  .lobby-header { margin-bottom: 30px; }
+  .game-hud { padding: 6px 10px; }
+  .hud-btn { font-size: 10px; padding: 3px 8px; }
+  .hud-round { font-size: 10px; }
+  .conv-scroll { padding: 12px 10px; }
+  .msg { padding: 8px 10px; gap: 8px; }
+  .msg-avatar { font-size: 18px; width: 26px; }
+  .msg-text { font-size: 12px; }
+  .whisper-panel { padding: 10px 12px; }
+  .whisper-input { font-size: 12px; padding: 8px 10px; }
+  .result-badge { font-size: 16px; letter-spacing: 1px; }
+  .result-score { font-size: 28px; }
+  .result-summary { font-size: 13px; }
+  .scenario-card { padding: 16px 14px; }
+  .random-btn { font-size: 12px; padding: 14px; }
 }
 
 /* Scrollbar */

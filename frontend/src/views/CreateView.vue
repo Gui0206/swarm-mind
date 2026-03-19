@@ -658,14 +658,34 @@ const whatsappShareUrl = computed(() => {
   .create-main {
     flex-direction: column;
     padding: 32px 16px 60px;
+    gap: 32px;
   }
   .preview-col {
     width: 100%;
-    order: -1;
+    order: 1;
   }
   .preview-sticky { position: static; }
   .page-title { font-size: 24px; }
   .action-row { flex-direction: column; }
   .nav { padding: 0 16px; }
+  .share-socials { flex-wrap: wrap; }
+  .agent-form-header { flex-wrap: wrap; }
+  .name-input { min-width: 0; }
+}
+
+@media (max-width: 480px) {
+  .create-main { padding: 20px 12px 40px; gap: 24px; }
+  .page-title { font-size: 20px; }
+  .page-sub { font-size: 12px; margin-bottom: 24px; }
+  .agent-form-card { padding: 12px; }
+  .agent-form-header { gap: 6px; }
+  .emoji-input { width: 38px; font-size: 18px; }
+  .name-input { font-size: 13px; }
+  .field-input, .field-textarea { font-size: 12px; padding: 8px 10px; }
+  .share-box { padding: 14px; }
+  .share-url-row { flex-direction: column; }
+  .share-url-input { width: 100%; }
+  .social-btn { font-size: 10px; padding: 8px; }
+  .btn-play { padding: 12px 16px; font-size: 12px; }
 }
 </style>

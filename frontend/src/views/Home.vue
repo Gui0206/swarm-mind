@@ -355,10 +355,25 @@ const { theme, toggle } = useTheme()
 .foot a:hover { text-decoration: underline; }
 
 @media (max-width: 800px) {
-  .hero { flex-direction: column; padding: 40px 20px; }
+  .hero { flex-direction: column; padding: 40px 20px; gap: 30px; }
   .hero-side { display: none; }
   .hero-title { font-size: 32px; }
+  .hero-desc { max-width: 100%; }
   .steps { grid-template-columns: 1fr 1fr; }
   .nav { padding: 0 16px; }
+  .how { padding: 40px 20px 60px; }
+  .features { flex-wrap: wrap; gap: 24px; }
+  .github-btn { margin-top: 0; margin-bottom: 24px; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 28px 16px; }
+  .hero-title { font-size: 26px; }
+  .hero-desc { font-size: 13px; }
+  .hero-btns { flex-direction: column; }
+  .play-btn, .create-btn { text-align: center; padding: 14px 20px; }
+  .steps { grid-template-columns: 1fr; }
+  .how { padding: 30px 16px 40px; }
+  .features { justify-content: center; }
 }
 </style>

@@ -69,6 +69,9 @@ html[data-theme="light"] {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text);
   background-color: var(--bg);
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Scrollbar */
