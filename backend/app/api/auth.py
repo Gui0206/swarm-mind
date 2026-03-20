@@ -10,7 +10,7 @@ from . import auth_bp
 from ..utils.logger import get_logger
 from ..config import Config
 
-logger = get_logger('mirofish.auth')
+logger = get_logger('swarmmind.auth')
 
 OPENROUTER_EXCHANGE_URL = 'https://openrouter.ai/api/v1/auth/keys'
 

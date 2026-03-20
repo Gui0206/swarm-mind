@@ -18,7 +18,7 @@ def create_app(config_class=Config):
     if hasattr(app, 'json') and hasattr(app.json, 'ensure_ascii'):
         app.json.ensure_ascii = False
 
-    logger = setup_logger('mirofish')
+    logger = setup_logger('swarmmind')
 
     is_reloader_process = os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
     debug_mode = app.config.get('DEBUG', False)
@@ -33,12 +33,12 @@ def create_app(config_class=Config):
 
     @app.before_request
     def log_request():
-        logger = get_logger('mirofish.request')
+        logger = get_logger('swarmmind.request')
         logger.debug(f"Request: {request.method} {request.path}")
 
     @app.after_request
     def log_response(response):
-        logger = get_logger('mirofish.request')
+        logger = get_logger('swarmmind.request')
         logger.debug(f"Response: {response.status_code}")
         return response
 

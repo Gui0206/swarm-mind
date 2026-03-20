@@ -10,7 +10,7 @@ from ..utils.llm_client import LLMClient
 from ..config import Config
 from ..utils.logger import get_logger
 
-logger = get_logger('mirofish.game.api')
+logger = get_logger('swarmmind.game.api')
 
 
 def _get_locale():

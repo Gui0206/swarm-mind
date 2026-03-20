@@ -9,7 +9,7 @@ import re
 from ..utils.llm_client import LLMClient
 from ..utils.logger import get_logger
 
-logger = get_logger('mirofish.game')
+logger = get_logger('swarmmind.game')
 
 # ============================================================
 # SCENARIOS

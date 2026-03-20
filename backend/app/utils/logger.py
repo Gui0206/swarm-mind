@@ -22,7 +22,7 @@ def _ensure_utf8_stdout():
             sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 
-def setup_logger(name: str = 'mirofish', level: int = logging.DEBUG) -> logging.Logger:
+def setup_logger(name: str = 'swarmmind', level: int = logging.DEBUG) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.propagate = False
@@ -68,39 +68,13 @@ def setup_logger(name: str = 'mirofish', level: int = logging.DEBUG) -> logging.
     return logger
 
 
-def get_logger(name: str = 'mirofish') -> logging.Logger:
-    """
-    获取日志器（如果不存在则创建）
-    
-    Args:
-        name: 日志器名称
-        
-    Returns:
-        日志器实例
-    """
+def get_logger(name: str = 'swarmmind') -> logging.Logger:
+    """Get a logger by name, creating it if needed."""
     logger = logging.getLogger(name)
     if not logger.handlers:
         return setup_logger(name)
     return logger
 
 
-# 创建默认日志器
 logger = setup_logger()
-
-
-# 便捷方法
-def debug(msg, *args, **kwargs):
-    logger.debug(msg, *args, **kwargs)
-
-def info(msg, *args, **kwargs):
-    logger.info(msg, *args, **kwargs)
-
-def warning(msg, *args, **kwargs):
-    logger.warning(msg, *args, **kwargs)
-
-def error(msg, *args, **kwargs):
-    logger.error(msg, *args, **kwargs)
-
-def critical(msg, *args, **kwargs):
-    logger.critical(msg, *args, **kwargs)
 
