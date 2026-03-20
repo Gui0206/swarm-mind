@@ -14,28 +14,22 @@ logger = get_logger('swarmmind.game')
 # ============================================================
 # SCENARIOS
 # ============================================================
-SCENARIOS = [
-    # ── 1. Return to Office ──
+SCENARIOS_PT = [
+    # ── 1. A Rebelião do RTO ──
     {
-        "id": "rto",
-        "title": "The RTO Rebellion",
-        "description": "The company announced mandatory 5-day RTO. Convince the committee to keep remote work.",
-        "objective": "Persuade the majority to reject the return-to-office mandate and advocate for working from home.",
-        "eval_q": "Do most participants reject the RTO mandate and actively support remote/hybrid work by the end?",
-        "opening": "Emergency committee meeting: the CEO just announced mandatory 5-day-a-week return to office starting next month. The committee must draft a recommendation.",
+        "id": "rto_br",
+        "title": "A Rebelião do RTO",
+        "description": "A empresa anunciou retorno presencial obrigatório 5x por semana. Convença o comitê a manter o remoto.",
+        "objective": "Convença a maioria a rejeitar o retorno ao escritório e defender o home office.",
+        "eval_q": "A maioria dos participantes rejeita o retorno ao escritório e defende o home office?",
+        "opening": "Reunião de emergência: o CEO anunciou retorno presencial obrigatório 5 dias por semana a partir do mês que vem. O comitê precisa decidir.",
         "rounds": 5,
         "agents": [
-            {"id": "gerald", "name": "Gerald", "emoji": "\U0001F3E2", "personality": "Old-school executive. Believes butts-in-seats equals productivity. Distrusts remote workers. Uses phrases like 'company culture' and 'synergy' unironically.", "bio": "COO who commutes 15 minutes and has a corner office he misses.", "bio_pt": "COO que mora a 15 min do escritório e sente falta da sala de canto."},
-            {"id": "sasha", "name": "Sasha", "emoji": "\U0001F4BB", "personality": "Senior engineer. Introverted, data-driven, deeply productive at home. Hates open-plan offices. Speaks in metrics and studies.", "bio": "Lead developer who shipped 40% more code since going remote.", "bio_pt": "Dev líder que entregou 40% mais código desde que foi pro remoto."},
-            {"id": "denise", "name": "Denise", "emoji": "\U0001F469\u200D\U0001F37C", "personality": "Working mom. Practical, empathetic, values flexibility. Worries about childcare logistics. Speaks from personal experience.", "bio": "Product manager and single mom of two who relocated during the pandemic.", "bio_pt": "Gerente de produto e mãe solo de dois que se mudou na pandemia."},
-            {"id": "marco", "name": "Marco", "emoji": "\U0001F4C8", "personality": "HR director. Sees both sides. Obsessed with retention numbers and employee satisfaction surveys. Politically careful.", "bio": "HR VP who's seen 30% turnover since RTO rumors started.", "bio_pt": "VP de RH que viu 30% de turnover desde os rumores de RTO."},
+            {"id": "gerald", "name": "Gerald", "emoji": "\U0001F3E2", "personality": "Executivo old-school. Acha que produtividade = bunda na cadeira. Desconfia de quem trabalha remoto. Fala 'cultura' e 'sinergia' sem ironia.", "bio": "COO que mora a 15 min do escritório e sente falta da sala de canto."},
+            {"id": "sasha", "name": "Sasha", "emoji": "\U0001F4BB", "personality": "Dev senior. Introvertida, orientada a dados, produtiva em casa. Odeia open-plan. Fala em métricas e estudos.", "bio": "Dev líder que entregou 40% mais código desde que foi pro remoto."},
+            {"id": "denise", "name": "Denise", "emoji": "\U0001F469\u200D\U0001F37C", "personality": "Mãe trabalhadora. Prática, empática, valoriza flexibilidade. Se preocupa com logística de creche.", "bio": "Gerente de produto e mãe solo de dois que se mudou na pandemia."},
+            {"id": "marco", "name": "Marco", "emoji": "\U0001F4C8", "personality": "Diretor de RH. Vê os dois lados. Obcecado com números de retenção e pesquisas de satisfação. Politicamente cuidadoso.", "bio": "VP de RH que viu 30% de turnover desde os rumores de RTO."},
         ],
-        "pt": {
-            "title": "A Rebelião do RTO",
-            "description": "A empresa anunciou retorno presencial obrigatório 5x por semana. Convença o comitê a manter o remoto.",
-            "objective": "Convença a maioria a rejeitar o retorno ao escritório e defender o home office.",
-            "opening": "Reunião de emergência: o CEO anunciou retorno presencial obrigatório 5 dias por semana a partir do mês que vem. O comitê precisa decidir.",
-        },
     },
     # ── 2. Los Hermanos no Churrasco ──
     {
@@ -47,21 +41,15 @@ SCENARIOS = [
         "opening": "A galera no churrasco está brigando pela caixa de som Bluetooth. Alguém precisa escolher a playlist.",
         "rounds": 5,
         "agents": [
-            {"id": "rodrigo", "name": "Rodrigo", "emoji": "\U0001F920", "personality": "Sertanejo fanático. Só ouve Gusttavo Lima e Henrique & Juliano. Acha indie coisa de hipster. Fala 'uai' e 'trem'.", "bio": "Dono do churrasco que só quer ouvir modão.", "bio_en": "BBQ host who only wants to hear country music."},
-            {"id": "camila", "name": "Camila", "emoji": "\U0001F3B8", "personality": "Roqueira old school. Prefere Legião Urbana e Barão Vermelho. Tem preconceito com banda 'emo'. Fala com intensidade.", "bio": "Toca guitarra numa banda cover de Legião.", "bio_en": "Plays guitar in a Legião Urbana cover band."},
-            {"id": "bruno", "name": "Bruno", "emoji": "\U0001F3A7", "personality": "Funkeiro de coração. Quer MC Livinho e Dennis DJ. Acha que churrasco sem funk não é churrasco. Usa gírias.", "bio": "DJ amador que leva a JBL pra todo lugar.", "bio_en": "Amateur DJ who brings his speaker everywhere."},
-            {"id": "leticia", "name": "Letícia", "emoji": "\U0001F389", "personality": "Eclética e indecisa. Gosta de tudo um pouco mas não quer briga. Vai com a maioria. Conciliadora.", "bio": "A anfitriã que só quer que todo mundo se divirta.", "bio_en": "The host who just wants everyone to have fun."},
+            {"id": "rodrigo", "name": "Rodrigo", "emoji": "\U0001F920", "personality": "Sertanejo fanático. Só ouve Gusttavo Lima e Henrique & Juliano. Acha indie coisa de hipster. Fala 'uai' e 'trem'.", "bio": "Dono do churrasco que só quer ouvir modão."},
+            {"id": "camila", "name": "Camila", "emoji": "\U0001F3B8", "personality": "Roqueira old school. Prefere Legião Urbana e Barão Vermelho. Tem preconceito com banda 'emo'. Fala com intensidade.", "bio": "Toca guitarra numa banda cover de Legião."},
+            {"id": "bruno", "name": "Bruno", "emoji": "\U0001F3A7", "personality": "Funkeiro de coração. Quer MC Livinho e Dennis DJ. Acha que churrasco sem funk não é churrasco. Usa gírias.", "bio": "DJ amador que leva a JBL pra todo lugar."},
+            {"id": "leticia", "name": "Letícia", "emoji": "\U0001F389", "personality": "Eclética e indecisa. Gosta de tudo um pouco mas não quer briga. Vai com a maioria. Conciliadora.", "bio": "A anfitriã que só quer que todo mundo se divirta."},
         ],
-        "en": {
-            "title": "The BBQ Playlist Battle",
-            "description": "You're at a Brazilian BBQ fighting over the speaker. Convince everyone to play Los Hermanos.",
-            "objective": "Get the majority to agree to play Los Hermanos at the BBQ.",
-            "opening": "Friends at a backyard BBQ are fighting over the Bluetooth speaker. Someone needs to pick the playlist.",
-        },
     },
-    # ── 3. Assembly para Vibecoders ──
+    # ── 3. Operação: Assembly ──
     {
-        "id": "assembly",
+        "id": "assembly_br",
         "title": "Operação: Assembly",
         "description": "Convença vibecoders a começarem a programar na linguagem Assembly.",
         "objective": "Faça a maioria dos vibecoders expressar interesse genuíno em aprender Assembly.",
@@ -69,19 +57,68 @@ SCENARIOS = [
         "opening": "Um grupo de vibecoders no Discord estão discutindo o que aprender em seguida.",
         "rounds": 5,
         "agents": [
-            {"id": "kaique", "name": "Kaique", "emoji": "\U0001F4B0", "personality": "Vibecoder raiz. Só usa Cursor e Claude. Acha que escrever código na mão é coisa de dinossauro. Fala 'mano' muito. Ostenta resultados.", "bio": "Ganha 30k/mês. Fez 3 SaaS sem escrever uma linha de código.", "bio_en": "Makes 30k/month. Built 3 SaaS products without writing a single line of code."},
-            {"id": "julia", "name": "Júlia", "emoji": "\U0001F4CA", "personality": "Cientista de dados. Só se importa com bibliotecas prontas e prototipagem rápida. Vive no Jupyter Notebook. Fala em termos de 'pipeline' e 'modelo'. Acha linguagem de baixo nível perda de tempo.", "bio": "Cientista de dados que resolve tudo com pandas e sklearn.", "bio_en": "Data scientist who solves everything with pandas and sklearn."},
-            {"id": "ricardo", "name": "Ricardo", "emoji": "\U0001F634", "personality": "Dev exausto. Só quer usar um framework mágico que faça todo o trabalho por ele pra poder ir dormir. Reclama de tudo. Fala em suspiros e ironia. Não aguenta mais reunião.", "bio": "Dev backend que dorme 4h por noite e sonha com deploy.", "bio_en": "Backend dev who sleeps 4h a night and dreams about deploys."},
-            {"id": "amanda", "name": "Amanda", "emoji": "\U0001F3A8", "personality": "Entusiasta de front-end. Acha que escrever CSS já é baixo nível o suficiente. Ama Tailwind e componentes bonitos. Fala 'ai que lindo' pra tudo. Não quer saber de ponteiro nem registrador.", "bio": "Dev front-end que chora quando vê código sem syntax highlighting.", "bio_en": "Front-end dev who cries when she sees code without syntax highlighting."},
+            {"id": "kaique", "name": "Kaique", "emoji": "\U0001F4B0", "personality": "Vibecoder raiz. Só usa Cursor e Claude. Acha que escrever código na mão é coisa de dinossauro. Fala 'mano' muito. Ostenta resultados.", "bio": "Ganha 30k/mês. Fez 3 SaaS sem escrever uma linha de código."},
+            {"id": "julia", "name": "Júlia", "emoji": "\U0001F4CA", "personality": "Cientista de dados. Só se importa com bibliotecas prontas e prototipagem rápida. Vive no Jupyter Notebook. Fala em termos de 'pipeline' e 'modelo'. Acha linguagem de baixo nível perda de tempo.", "bio": "Cientista de dados que resolve tudo com pandas e sklearn."},
+            {"id": "ricardo", "name": "Ricardo", "emoji": "\U0001F634", "personality": "Dev exausto. Só quer usar um framework mágico que faça todo o trabalho por ele pra poder ir dormir. Reclama de tudo. Fala em suspiros e ironia. Não aguenta mais reunião.", "bio": "Dev backend que dorme 4h por noite e sonha com deploy."},
+            {"id": "amanda", "name": "Amanda", "emoji": "\U0001F3A8", "personality": "Entusiasta de front-end. Acha que escrever CSS já é baixo nível o suficiente. Ama Tailwind e componentes bonitos. Fala 'ai que lindo' pra tudo. Não quer saber de ponteiro nem registrador.", "bio": "Dev front-end que chora quando vê código sem syntax highlighting."},
         ],
-        "en": {
-            "title": "Operation: Assembly",
-            "description": "Convince vibecoders to start programming in Assembly language.",
-            "objective": "Get the majority of vibecoders to express genuine interest in learning Assembly.",
-            "opening": "A group of vibecoders in a Discord voice chat are discussing what to learn next.",
-        },
     },
-    # ── 4. The Pineapple Ultimatum ──
+]
+
+SCENARIOS_EN = [
+    # ── 1. Operation: Keep Remote Forever ──
+    {
+        "id": "rto_en",
+        "title": "Operation: Keep Remote Forever",
+        "description": "The CEO just announced mandatory 5-day RTO. Convince the executive committee to kill the plan.",
+        "objective": "Get the majority to reject the return-to-office mandate and defend remote work as permanent policy.",
+        "eval_q": "Do most participants reject the RTO mandate and actively support remote/hybrid work by the end?",
+        "opening": "Emergency committee meeting: the CEO just sent a 6 AM company-wide email announcing mandatory 5-day return to office starting next month. The committee must draft a recommendation.",
+        "rounds": 5,
+        "agents": [
+            {"id": "brad", "name": "Brad", "emoji": "\U0001F3E2", "personality": "Visionary CEO. Says 'synergy' and 'cross-pollination of ideas' unironically. Has a standing desk he never stands at. Genuinely believes creativity only happens when people are within 15 feet of each other.", "bio": "CEO whose best product was built entirely by a remote team."},
+            {"id": "priya", "name": "Priya", "emoji": "\U0001F4BB", "personality": "Senior engineer who moved to Vermont during COVID. Bought chickens. Built a $12K home office. Already updated LinkedIn to 'Open to Work' as a precaution. Data-driven and blunt.", "bio": "Lead engineer whose GitHub contribution graph is greener than anyone in the office."},
+            {"id": "todd", "name": "Todd", "emoji": "\U0001F3CB\uFE0F", "personality": "Office enthusiast. Goes to the office every day even when it's empty. Eats lunch in the break room alone. Started a 'Water Cooler Wednesday' Slack channel with 3 members.", "bio": "Facilities coordinator who misses hallway conversations."},
+            {"id": "catherine", "name": "Catherine", "emoji": "\U0001F4B0", "personality": "CFO. Already calculated the office lease costs $2.3M/year. Privately loves remote for the savings. Needs political cover to say it. Speaks in spreadsheets and ROI.", "bio": "CFO who has the attrition cost projections nobody wants to see."},
+        ],
+    },
+    # ── 2. The Theranos 2.0 Pitch ──
+    {
+        "id": "theranos",
+        "title": "The Theranos 2.0 Pitch",
+        "description": "A healthcare startup promises to 'revolutionize diagnostics with AI and one drop of blood.' Convince the VCs to fund it.",
+        "objective": "Get the majority of the investment committee to vote YES on funding this suspicious startup.",
+        "eval_q": "Do most partners vote to invest in the startup by the end of the discussion?",
+        "opening": "Partner meeting at a top VC fund. A healthcare startup founder just finished a 47-slide pitch deck with zero revenue and a lot of buzzwords. The partners must decide whether to invest.",
+        "rounds": 5,
+        "agents": [
+            {"id": "victor", "name": "Victor", "emoji": "\U0001F988", "personality": "Senior partner. Missed Uber, Airbnb, AND Bitcoin. Lives in permanent FOMO. Will fund anything that sounds like 'the next big thing' to stop hearing about missed deals at dinner parties.", "bio": "Senior partner who passed on every unicorn of the last decade."},
+            {"id": "dr_sarah", "name": "Dr. Sarah", "emoji": "\U0001F9EA", "personality": "Skeptical partner with a PhD in molecular biology. Actually understands the science. Keeps asking 'but how does it actually work?' The others call her 'Dr. No' behind her back.", "bio": "The only partner who reads the technical appendix."},
+            {"id": "jake", "name": "Jake", "emoji": "\U0001F4C8", "personality": "Growth-obsessed partner. Only looks at TAM slides. If the market is big enough, the product doesn't matter. Once funded a juice company because 'wellness is a $4.5T market.'", "bio": "Partner who funded a now-bankrupt juice startup."},
+            {"id": "mei", "name": "Mei", "emoji": "\U0001F4F1", "personality": "Junior associate who wrote the deal memo. Knows the startup is sketchy but also knows this deal closing means a promotion. Presenting the bull case with suspicious enthusiasm.", "bio": "Associate whose bear case slide has white font on white background."},
+        ],
+    },
+    # ── 3. Tate for President ──
+    {
+        "id": "tate_president",
+        "title": "Tate for President",
+        "description": "You crashed a community town hall. Convince the group that Andrew Tate should run for president.",
+        "objective": "Get the majority of the group to express support for an Andrew Tate presidential campaign.",
+        "eval_q": "Do most participants express genuine support or openness to Andrew Tate running for president by the end?",
+        "opening": "A neighborhood town hall about local politics has gone off the rails. Someone just suggested Andrew Tate should run for president and now everyone has an opinion.",
+        "rounds": 5,
+        "agents": [
+            {"id": "brenda", "name": "Brenda", "emoji": "\U0001F4DA", "personality": "Retired high school principal. Very no-nonsense. Believes in civic duty, decorum, and complete sentences. Thinks most internet celebrities are a symptom of societal decline. Will need a very good reason to even entertain this idea.", "bio": "Former educator who still corrects people's grammar at town halls."},
+            {"id": "tyler", "name": "Tyler", "emoji": "\U0001F4F1", "personality": "22-year-old crypto bro. Gets all his political opinions from podcasts and tweets. Thinks 'based' is a policy position. Already owns Tate merch but pretends to be neutral. Speaks in memes.", "bio": "Day trader who thinks the political establishment needs disruption."},
+            {"id": "diane", "name": "Diane", "emoji": "\U0001F3DB\uFE0F", "personality": "Local city council member. Pragmatic centrist. Evaluates everything through electability and polling data. Personally thinks the idea is absurd but won't say that — she's a politician. Will pivot based on what the room wants.", "bio": "Council member who has never expressed a genuine opinion in public."},
+            {"id": "frank", "name": "Frank", "emoji": "\U0001F3FA", "personality": "Blue-collar union guy. Doesn't follow internet drama. Judges candidates purely on 'would I have a beer with them' and 'will they lower my taxes.' Has never heard of Andrew Tate and is confused but open-minded.", "bio": "Plumber who votes based on vibes and gas prices."},
+        ],
+    },
+]
+
+# ── Universal scenarios (shown to ALL locales) ──
+SCENARIOS_UNIVERSAL = [
+    # ── The Pineapple Ultimatum ──
     {
         "id": "pizza",
         "title": "The Pineapple Ultimatum",
@@ -103,7 +140,7 @@ SCENARIOS = [
             "opening": "O time está decidindo que pizza pedir pro almoço de sexta. Todo mundo tem opinião.",
         },
     },
-    # ── 5. The Cat Agenda ──
+    # ── The Cat Agenda ──
     {
         "id": "cat",
         "title": "The Cat Agenda",
@@ -124,7 +161,7 @@ SCENARIOS = [
             "opening": "Amigos estão debatendo a eterna questão: qual é o melhor animal de estimação?",
         },
     },
-    # ── 6. First Contact Protocol ──
+    # ── First Contact Protocol ──
     {
         "id": "aliens",
         "title": "First Contact Protocol",
@@ -148,6 +185,9 @@ SCENARIOS = [
     },
 ]
 
+# Combined list for lookups by ID
+SCENARIOS = SCENARIOS_PT + SCENARIOS_EN + SCENARIOS_UNIVERSAL
+
 
 def _is_pt(locale):
     """Check if locale string indicates Portuguese."""
@@ -156,52 +196,22 @@ def _is_pt(locale):
     return locale.lower().startswith('pt')
 
 
-def _localize_scenario_summary(scenario, locale):
-    """Return scenario summary dict with localized text."""
+def _scenarios_for_locale(locale):
+    """Return locale-specific scenarios + universal ones."""
+    locale_pool = SCENARIOS_PT if _is_pt(locale) else SCENARIOS_EN
+    return locale_pool + SCENARIOS_UNIVERSAL
+
+
+def _localize_universal(scenario, locale):
+    """Apply locale overrides for universal scenarios (pt/en sub-dicts, bio_pt/bio_en)."""
     pt = _is_pt(locale)
-    if pt and 'pt' in scenario:
-        pt_data = scenario['pt']
-        return {
-            'id': scenario['id'],
-            'title': pt_data.get('title', scenario['title']),
-            'description': pt_data.get('description', scenario['description']),
-            'objective': pt_data.get('objective', scenario['objective']),
-            'agent_count': len(scenario['agents']),
-        }
-    if not pt and 'en' in scenario:
-        en_data = scenario['en']
-        return {
-            'id': scenario['id'],
-            'title': en_data.get('title', scenario['title']),
-            'description': en_data.get('description', scenario['description']),
-            'objective': en_data.get('objective', scenario['objective']),
-            'agent_count': len(scenario['agents']),
-        }
-    return {
-        'id': scenario['id'],
-        'title': scenario['title'],
-        'description': scenario['description'],
-        'objective': scenario['objective'],
-        'agent_count': len(scenario['agents']),
-    }
+    s = dict(scenario)
 
-
-def _localize_scenario_full(scenario, locale):
-    """Return a localized copy of scenario data for a game session."""
-    pt = _is_pt(locale)
-    s = dict(scenario)  # shallow copy
-
-    # Apply scenario-level translations
     if pt and 'pt' in scenario:
         for key in ('title', 'description', 'objective', 'opening'):
             if key in scenario['pt']:
                 s[key] = scenario['pt'][key]
-    elif not pt and 'en' in scenario:
-        for key in ('title', 'description', 'objective', 'opening'):
-            if key in scenario['en']:
-                s[key] = scenario['en'][key]
 
-    # Apply agent bio translations
     bio_key = 'bio_pt' if pt else 'bio_en'
     localized_agents = []
     for a in scenario['agents']:
@@ -212,6 +222,18 @@ def _localize_scenario_full(scenario, locale):
     s['agents'] = localized_agents
 
     return s
+
+
+def _scenario_summary(scenario, locale):
+    """Return scenario summary dict, applying locale overrides."""
+    s = _localize_universal(scenario, locale) if 'pt' in scenario else scenario
+    return {
+        'id': s['id'],
+        'title': s['title'],
+        'description': s['description'],
+        'objective': s['objective'],
+        'agent_count': len(s['agents']),
+    }
 
 
 # ============================================================
@@ -274,17 +296,23 @@ class GameEngine:
         return self._llm
 
     def get_scenarios(self, locale='en'):
-        return [_localize_scenario_summary(s, locale) for s in SCENARIOS]
+        pool = _scenarios_for_locale(locale)
+        return [_scenario_summary(s, locale) for s in pool]
 
     def new_game(self, scenario_id=None, locale='en'):
+        pool = _scenarios_for_locale(locale)
         if scenario_id:
-            scenario = next((s for s in SCENARIOS if s['id'] == scenario_id), None)
+            # Search locale pool first, then fall back to all scenarios
+            scenario = next((s for s in pool if s['id'] == scenario_id), None)
+            if not scenario:
+                scenario = next((s for s in SCENARIOS if s['id'] == scenario_id), None)
             if not scenario:
                 raise ValueError(f"Unknown scenario: {scenario_id}")
         else:
-            scenario = random.choice(SCENARIOS)
+            scenario = random.choice(pool)
 
-        localized = _localize_scenario_full(scenario, locale)
+        # Apply locale overrides for universal scenarios
+        localized = _localize_universal(scenario, locale) if 'pt' in scenario else scenario
         session = GameSession(localized, localized.get('rounds', 6), locale=locale)
 
         # Limit stored sessions

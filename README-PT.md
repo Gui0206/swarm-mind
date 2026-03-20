@@ -8,7 +8,7 @@ Um jogo de navegador movido por LLM onde você tenta convencer um enxame de agen
 
 [Jogar Agora](https://swarm-mind-three.vercel.app/)
 
-![Seleção de Cenário](screenshot.png)
+![Seleção de Cenário](screenshot-pt.png)
 
 </div>
 
