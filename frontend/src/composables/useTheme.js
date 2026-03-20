@@ -1,6 +1,6 @@
 import { ref, watchEffect } from 'vue'
 
-const theme = ref(localStorage.getItem('swarm-theme') || 'dark')
+const theme = ref(localStorage.getItem('swarm-theme') || 'light')
 
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t)
