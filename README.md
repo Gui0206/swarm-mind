@@ -1,10 +1,14 @@
+🇧🇷 [Leia em Português](README-PT.md)
+
 <div align="center">
 
-# Prompt Survivors
+# Swarm Mind
 
 **Whisper to AI agents. Shape reality.**
 
-An LLM-powered social manipulation game where you're a hidden puppet master in a room of AI personalities.
+An LLM-powered browser game where you try to persuade a swarm of stubborn AI agents to agree with absurd or highly debated ideas.
+
+[Play Now](https://swarm-mind-three.vercel.app/)
 
 </div>
 
@@ -14,23 +18,46 @@ You enter a room full of AI agents — each with a unique personality, opinions,
 
 Every agent response is a real LLM call — no scripts, no canned answers. Every game plays out differently.
 
+## How It Works
+
+1. **Choose a scenario** — pick a mission with unique agents and a secret objective
+2. **Observe** — watch agents debate in Round 1 using their distinct personalities
+3. **Whisper** — each round, secretly message one agent to steer their thinking
+4. **Watch emergence** — agents respond with real LLM intelligence, shaped by your whisper and group dynamics
+5. **Get judged** — an AI evaluator scores how well you achieved your objective
+
+## How I Built It
+
+I was messing around with an open-source repo called [MiroFish](https://github.com/MiroFish/MiroFish) and thought it could become a game. So I prompted Claude with:
+
+> *"Create a really really fun and viral browser game. Use your creativity to create something innovative and brand new. The game has to include swarm agents as a key mechanic. You can change the frontend, the backend, feel free to experiment (just don't break anything)."*
+
+And then vibe-coded the whole thing from there.
+
+## Contributing
+
+The prompt engineering for the swarm agents is still rough — sometimes they agree too easily or become caricatures of their system prompts. If you're good at prompt engineering or want to tweak the debate loop, PRs are incredibly welcome.
+
+## Stateless Custom Levels
+
+The game has a custom scenario builder. Instead of a database, the entire configuration (agent personalities, goals, rules) is compressed and passed directly into the URL. You can build a scenario, copy the massive URL, and send it to a friend.
+
 ## Tech Stack
 
 | Layer | Stack |
 |-------|-------|
-| **Frontend** | Vue 3, Vue Router, Vite, Axios |
-| **Backend** | Python 3.11+, Flask, Flask-CORS |
-| **LLM** | OpenAI SDK (any OpenAI-compatible API) |
-| **Auth** | OpenRouter OAuth (BYOK fallback) |
-| **Infra** | Docker, GitHub Actions (GHCR) |
+| **Frontend** | Vue 3, Vite, Vercel |
+| **Backend** | Python, Flask, Railway |
+| **LLM** | Google Gemini 3 Flash via OpenRouter |
+| **Auth** | OpenRouter OAuth (BYOK) |
 
 ## Quick Start
 
 ### Prerequisites
 
-- **Node.js** 18+ — `node -v`
-- **Python** 3.11+ — `python --version`
-- **uv** (Python package manager) — `uv --version`
+- **Node.js** 18+
+- **Python** 3.11+
+- **uv** (Python package manager)
 
 ### 1. Configure
 
@@ -42,8 +69,8 @@ Edit `.env` with your LLM provider credentials:
 
 ```env
 LLM_API_KEY=your_api_key_here
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_MODEL_NAME=gpt-4o-mini
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL_NAME=google/gemini-3-flash-preview
 ```
 
 ### 2. Install & Run
@@ -54,44 +81,6 @@ npm run dev
 ```
 
 Open **http://localhost:3000** and click **PLAY NOW**.
-
-### Docker
-
-```bash
-cp .env.example .env
-docker compose up -d
-```
-
-## How It Works
-
-1. **Choose a scenario** — pick a mission with unique agents and a secret objective
-2. **Observe** — watch agents debate in Round 1 using their distinct personalities
-3. **Whisper** — each round, secretly message one agent to steer their thinking
-4. **Watch emergence** — agents respond with real LLM intelligence, shaped by your whisper and group dynamics
-5. **Get judged** — an AI evaluator scores how well you achieved your objective
-
-## Project Structure
-
-```
-backend/
-  app/
-    api/game.py              # Game API endpoints
-    api/auth.py              # OpenRouter OAuth callback
-    services/game_engine.py  # Game logic, scenarios, LLM agent orchestration
-    utils/llm_client.py      # OpenAI SDK wrapper
-    config.py                # LLM + BYOK configuration
-
-frontend/
-  src/
-    views/Home.vue           # Landing page
-    views/GameView.vue       # Main game UI + BYOK modal
-    views/CreateView.vue     # Custom scenario creator
-    views/AuthCallback.vue   # OpenRouter OAuth callback handler
-    composables/useAuth.js   # BYOK auth state (localStorage, no DB)
-    api/game.js              # Game API client
-    api/index.js             # Axios instance + interceptors
-    router/index.js          # Routes
-```
 
 ## License
 
