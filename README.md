@@ -10,7 +10,7 @@ An LLM-powered browser game where you try to persuade a swarm of stubborn AI age
 
 [Play Now](https://swarm-mind-three.vercel.app/)
 
-[Scenario Selection](screenshot.png)
+![Scenario Selection](screenshot.png)
 
 </div>
 
