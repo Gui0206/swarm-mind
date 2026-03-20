@@ -387,7 +387,9 @@ onMounted(async () => {
   try {
     scenarios.value = await gameApi.getScenarios()
   } catch (e) {
-    error.value = 'Could not connect to backend. Make sure the Flask server is running on port 5001.'
+    error.value = import.meta.env.DEV
+      ? 'Could not connect to backend. Make sure the Flask server is running on port 5001.'
+      : 'Could not connect to server. Please try again later.'
   }
 })
 

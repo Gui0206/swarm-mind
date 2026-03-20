@@ -6,8 +6,8 @@ const STORAGE_KEY = 'openrouter_user_key'
 const systemLang = navigator.language || navigator.userLanguage || 'en'
 
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
-  timeout: 300000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5001' : ''),
+  timeout: 120000,
   headers: {
     'Content-Type': 'application/json'
   }
