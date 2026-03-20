@@ -8,6 +8,8 @@ Um jogo de navegador movido por LLM onde você tenta convencer um enxame de agen
 
 [Jogar Agora](https://swarm-mind-three.vercel.app/)
 
+![Seleção de Cenário](screenshot.png)
+
 </div>
 
 ## O Que É Isso?
@@ -26,7 +28,7 @@ Cada resposta dos agentes é uma chamada real de LLM — sem scripts, sem respos
 
 ## Como Eu Construí
 
-Eu estava mexendo em um repositório open-source chamado [MiroFish](https://github.com/MiroFish/MiroFish) e pensei que poderia virar um jogo. Então eu mandei esse prompt pro Claude:
+Eu estava mexendo em um repositório open-source chamado [MiroFish](https://github.com/666ghj/MiroFish) e pensei que poderia virar um jogo. Então eu mandei esse prompt pro Claude:
 
 > *"Create a really really fun and viral browser game. Use your creativity to create something innovative and brand new. The game has to include swarm agents as a key mechanic. You can change the frontend, the backend, feel free to experiment (just don't break anything)."*
 

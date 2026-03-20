@@ -10,6 +10,8 @@ An LLM-powered browser game where you try to persuade a swarm of stubborn AI age
 
 [Play Now](https://swarm-mind-three.vercel.app/)
 
+[Scenario Selection](screenshot.png)
+
 </div>
 
 ## What Is This?
@@ -28,7 +30,7 @@ Every agent response is a real LLM call — no scripts, no canned answers. Every
 
 ## How I Built It
 
-I was messing around with an open-source repo called [MiroFish](https://github.com/MiroFish/MiroFish) and thought it could become a game. So I prompted Claude with:
+I was messing around with an open-source repo called [MiroFish](https://github.com/666ghj/MiroFish) and thought it could become a game. So I prompted Claude with:
 
 > *"Create a really really fun and viral browser game. Use your creativity to create something innovative and brand new. The game has to include swarm agents as a key mechanic. You can change the frontend, the backend, feel free to experiment (just don't break anything)."*
 

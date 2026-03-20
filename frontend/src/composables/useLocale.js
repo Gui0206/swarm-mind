@@ -6,7 +6,8 @@
  */
 import { computed } from 'vue'
 
-const systemLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase()
+const urlLang = new URLSearchParams(window.location.search).get('lang')
+const systemLang = (urlLang || navigator.language || navigator.userLanguage || 'en').toLowerCase()
 const isPtBr = systemLang.startsWith('pt')
 
 const PT = {

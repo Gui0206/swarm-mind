@@ -2,8 +2,9 @@ import axios from 'axios'
 
 const STORAGE_KEY = 'openrouter_user_key'
 
-// Detect system language once at startup
-const systemLang = navigator.language || navigator.userLanguage || 'en'
+// Detect system language once at startup (URL ?lang= override supported)
+const urlLang = new URLSearchParams(window.location.search).get('lang')
+const systemLang = urlLang || navigator.language || navigator.userLanguage || 'en'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5001' : ''),
